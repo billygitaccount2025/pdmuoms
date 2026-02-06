@@ -1,0 +1,228 @@
+@extends('layouts.dashboard')
+
+@section('title', 'Fund Utilization Report')
+@section('page-title', 'Fund Utilization Report')
+
+@section('content')
+    <div class="content-header">
+        <h1>Fund Utilization Report</h1>
+        <p>Manage fund utilization reports and project documents</p>
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;">
+            <button onclick="openExportModal('excel')" style="display: inline-block; padding: 10px 18px; background-color: #15803d; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(21, 128, 61, 0.2);">
+                <i class="fas fa-file-excel" style="margin-right: 8px;"></i> Export Excel
+            </button>
+        </div>
+    </div>
+
+    @if (session('success'))
+        <div style="background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 16px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-check-circle"></i>
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
+
+    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); margin-bottom: 20px; border: 1px solid #e5e7eb;">
+        <form method="GET" action="{{ route('fund-utilization.index') }}" style="display: grid; grid-template-columns: minmax(220px, 2fr) repeat(3, minmax(140px, 1fr)) auto auto; gap: 10px; align-items: center;">
+            <div style="position: relative;">
+                <i class="fas fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #6b7280; font-size: 12px;"></i>
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ $filters['search'] ?? '' }}"
+                    placeholder="Search project code, title, province..."
+                    style="width: 100%; padding: 10px 12px 10px 32px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; background-color: #f9fafb;"
+                >
+            </div>
+            <select name="fund_source" style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; background-color: #f9fafb;">
+                <option value="">All Fund Sources</option>
+                @foreach(($filterOptions['fund_sources'] ?? []) as $option)
+                    <option value="{{ $option }}" {{ ($filters['fund_source'] ?? '') === $option ? 'selected' : '' }}>{{ $option }}</option>
+                @endforeach
+            </select>
+            <select name="funding_year" style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; background-color: #f9fafb;">
+                <option value="">All Years</option>
+                @foreach(($filterOptions['funding_years'] ?? []) as $option)
+                    <option value="{{ $option }}" {{ (string) ($filters['funding_year'] ?? '') === (string) $option ? 'selected' : '' }}>{{ $option }}</option>
+                @endforeach
+            </select>
+            <select name="province" style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; background-color: #f9fafb;">
+                <option value="">All Provinces</option>
+                @foreach(($filterOptions['provinces'] ?? []) as $option)
+                    <option value="{{ $option }}" {{ ($filters['province'] ?? '') === $option ? 'selected' : '' }}>{{ $option }}</option>
+                @endforeach
+            </select>
+            <button type="submit" style="padding: 10px 14px; background-color: #002C76; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; white-space: nowrap;">
+                <i class="fas fa-filter" style="margin-right: 6px;"></i> Apply
+            </button>
+            <a href="{{ route('fund-utilization.index') }}" style="padding: 10px 14px; background-color: #6b7280; color: white; border: none; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px; text-align: center; white-space: nowrap;">
+                Reset
+            </a>
+        </form>
+    </div>
+
+    <!-- Reports Card -->
+    <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background-color: #f3f4f6; border-bottom: 2px solid #e5e7eb;">
+                    <th style="padding: 12px; text-align: left; color: #374151; font-weight: 600; font-size: 14px;">Project Code</th>
+                    <th style="padding: 12px; text-align: left; color: #374151; font-weight: 600; font-size: 14px;">Project Title</th>
+                    <th style="padding: 12px; text-align: left; color: #374151; font-weight: 600; font-size: 14px;">Province</th>
+                    <th style="padding: 12px; text-align: left; color: #374151; font-weight: 600; font-size: 14px;">Implementing Unit</th>
+                    <th style="padding: 12px; text-align: left; color: #374151; font-weight: 600; font-size: 14px;">Barangay</th>
+                    <th style="padding: 12px; text-align: left; color: #374151; font-weight: 600; font-size: 14px;">Fund Source</th>
+                    <th style="padding: 12px; text-align: left; color: #374151; font-weight: 600; font-size: 14px;">Funding Year</th>
+                    <th style="padding: 12px; text-align: left; color: #374151; font-weight: 600; font-size: 14px;">Allocation</th>
+                    <th style="padding: 12px; text-align: left; color: #374151; font-weight: 600; font-size: 14px;">Contract Amount</th>
+                    <th style="padding: 12px; text-align: left; color: #374151; font-weight: 600; font-size: 14px;">Project Status</th>
+                    <th style="padding: 12px; text-align: center; color: #374151; font-weight: 600; font-size: 14px;">Q1 %</th>
+                    <th style="padding: 12px; text-align: center; color: #374151; font-weight: 600; font-size: 14px;">Q2 %</th>
+                    <th style="padding: 12px; text-align: center; color: #374151; font-weight: 600; font-size: 14px;">Q3 %</th>
+                    <th style="padding: 12px; text-align: center; color: #374151; font-weight: 600; font-size: 14px;">Q4 %</th>
+                    <th style="padding: 12px; text-align: center; color: #374151; font-weight: 600; font-size: 14px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($reports as $report)
+                    <tr style="border-bottom: 1px solid #e5e7eb; transition: all 0.3s ease;">
+                        <td style="padding: 12px; color: #111827; font-size: 14px;">{{ $report->project_code }}</td>
+                        <td style="padding: 12px; color: #111827; font-size: 14px;">{{ \Str::limit($report->project_title, 40) }}</td>
+                        <td style="padding: 12px; color: #111827; font-size: 14px;">{{ $report->province }}</td>
+                        <td style="padding: 12px; color: #111827; font-size: 14px;">{{ $report->implementing_unit }}</td>
+                        <td style="padding: 12px; color: #111827; font-size: 14px;">
+                            @php
+                                $barangayList = collect(preg_split('/[\\r\\n,]+/', $report->barangay ?? ''))
+                                    ->map(fn($item) => trim($item))
+                                    ->filter();
+                            @endphp
+                            @if($barangayList->isEmpty())
+                                <span>Not specified</span>
+                            @else
+                                <ul style="margin: 0; padding-left: 18px;">
+                                    @foreach($barangayList as $barangay)
+                                        <li>{{ $barangay }}</li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </td>
+                        <td style="padding: 12px; color: #111827; font-size: 14px;">{{ $report->fund_source }}</td>
+                        <td style="padding: 12px; color: #111827; font-size: 14px;">{{ $report->funding_year }}</td>
+                        <td style="padding: 12px; color: #111827; font-size: 14px;">{{ $report->allocation ? '₱' . number_format($report->allocation, 2) : '-' }}</td>
+                        <td style="padding: 12px; color: #111827; font-size: 14px;">{{ $report->contract_amount ? '₱' . number_format($report->contract_amount, 2) : '-' }}</td>
+                        <td style="padding: 12px; color: #111827; font-size: 14px;">{{ $report->project_status }}</td>
+                        <td style="padding: 12px; text-align: center; color: {{ $report->quarter_q1_percentage == 100 ? '#10b981' : ($report->quarter_q1_percentage > 70 ? '#f59e0b' : '#ef4444') }}; font-size: 14px; font-weight: 600;">{{ $report->quarter_q1_percentage }}%</td>
+                        <td style="padding: 12px; text-align: center; color: {{ $report->quarter_q2_percentage == 100 ? '#10b981' : ($report->quarter_q2_percentage > 70 ? '#f59e0b' : '#ef4444') }}; font-size: 14px; font-weight: 600;">{{ $report->quarter_q2_percentage }}%</td>
+                        <td style="padding: 12px; text-align: center; color: {{ $report->quarter_q3_percentage == 100 ? '#10b981' : ($report->quarter_q3_percentage > 70 ? '#f59e0b' : '#ef4444') }}; font-size: 14px; font-weight: 600;">{{ $report->quarter_q3_percentage }}%</td>
+                        <td style="padding: 12px; text-align: center; color: {{ $report->quarter_q4_percentage == 100 ? '#10b981' : ($report->quarter_q4_percentage > 70 ? '#f59e0b' : '#ef4444') }}; font-size: 14px; font-weight: 600;">{{ $report->quarter_q4_percentage }}%</td>
+                        <td style="padding: 12px; text-align: center;">
+                            <a href="{{ route('fund-utilization.show', $report->project_code) }}" style="display: inline-block; padding: 8px 16px; background-color: #002C76; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; text-decoration: none; transition: all 0.3s ease;">
+                                <i class="fas fa-eye" style="margin-right: 4px;"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="15" style="padding: 40px; text-align: center; color: #6b7280;">
+                            <i class="fas fa-inbox" style="font-size: 32px; margin-bottom: 10px; display: block;"></i>
+                            No reports found. Create one to get started.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); max-width: 400px; width: 90%;">
+            <h3 style="margin: 0 0 20px 0; color: #111827; font-size: 18px; font-weight: 600;">Select Quarter for Export</h3>
+            <form id="exportForm" method="GET" action="{{ route('fund-utilization.export') }}">
+                <div style="margin-bottom: 20px;">
+                    <label for="quarter" style="display: block; margin-bottom: 8px; color: #374151; font-weight: 500;">Quarter:</label>
+                    <select id="quarter" name="quarter" required style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background-color: #f9fafb;">
+                        <option value="">Select Quarter</option>
+                        <option value="Q1">Q1 (January - March)</option>
+                        <option value="Q2">Q2 (April - June)</option>
+                        <option value="Q3">Q3 (July - September)</option>
+                        <option value="Q4">Q4 (October - December)</option>
+                    </select>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" onclick="closeExportModal()" style="padding: 10px 20px; background-color: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;"><i class="fas fa-times" style="margin-right: 8px;"></i>Cancel</button>
+                    <button type="submit" id="exportBtn" style="padding: 10px 20px; background-color: #002C76; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">Export</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let selectedFormat = '';
+
+        function openExportModal(format) {
+            selectedFormat = format;
+            document.getElementById('exportModal').style.display = 'flex';
+        }
+
+        function closeExportModal() {
+            document.getElementById('exportModal').style.display = 'none';
+            selectedFormat = '';
+        }
+
+        document.getElementById('exportForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const quarter = document.getElementById('quarter').value;
+            if (!quarter) {
+                alert('Please select a quarter.');
+                return;
+            }
+
+            // Build the export URL with selected format and quarter
+            const baseUrl = '{{ route("fund-utilization.export") }}';
+            const url = new URL(baseUrl);
+            url.searchParams.set('format', selectedFormat);
+            url.searchParams.set('quarter', quarter);
+
+            // Add current query parameters (search, fund_source, etc.)
+            const currentUrl = new URL(window.location.href);
+            for (let [key, value] of currentUrl.searchParams) {
+                if (key !== 'format' && key !== 'quarter') {
+                    url.searchParams.set(key, value);
+                }
+            }
+
+            // Redirect to the export URL
+            window.location.href = url.toString();
+        });
+    </script>
+
+    <style>
+        tr:hover {
+            background-color: #f9fafb !important;
+        }
+
+        table td,
+        table th {
+            vertical-align: top;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #002C76;
+            box-shadow: 0 0 0 3px rgba(0, 44, 118, 0.12);
+            background-color: white;
+        }
+
+        a:hover {
+            background-color: #001f59 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 44, 118, 0.2);
+        }
+
+        @media (max-width: 1100px) {
+            form[method="GET"] {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+@endsection
