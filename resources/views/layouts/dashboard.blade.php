@@ -40,16 +40,17 @@
             background: linear-gradient(135deg, #002C76 0%, #003d99 100%);
             padding: 20px;
             overflow-y: auto;
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            will-change: transform;
             z-index: 1000;
             box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+            transform: translateX(0);
         }
         
         .sidebar.collapsed {
-            width: 0;
-            padding: 0;
-            overflow: hidden;
+            transform: translateX(-100%);
             box-shadow: none;
+            pointer-events: none;
         }
         
         .sidebar-header {
@@ -168,7 +169,7 @@
             padding: 0 30px;
             z-index: 999;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: none;
         }
         
         .topbar.with-sidebar {
@@ -219,6 +220,15 @@
             display: flex;
             align-items: center;
             gap: 20px;
+        }
+
+        .pagasa-clock {
+            font-size: 12px;
+            font-weight: 600;
+            color: #002C76;
+            white-space: nowrap;
+            min-width: 250px;
+            text-align: right;
         }
         
         /* Profile Dropdown */
@@ -288,6 +298,123 @@
             font-size: 11px;
             font-weight: 600;
             border: 2px solid white;
+        }
+
+        .notification-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .notification-menu {
+            position: absolute;
+            top: 48px;
+            right: 0;
+            width: min(380px, calc(100vw - 24px));
+            max-height: 420px;
+            overflow-y: auto;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+            display: none;
+            z-index: 1100;
+        }
+
+        .notification-menu.show {
+            display: block;
+            animation: slideDown 0.2s ease;
+        }
+
+        .notification-menu-header {
+            padding: 10px 14px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .notification-menu-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #002C76;
+        }
+
+        .notification-clear-btn {
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #334155;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .notification-clear-btn:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+
+        .notification-menu-empty {
+            padding: 14px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .notification-menu-item {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            padding: 10px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.16s ease;
+        }
+
+        .notification-menu-item:hover {
+            background: #f8fafc;
+        }
+
+        .notification-menu-item.unread {
+            background: #eff6ff;
+        }
+
+        .notification-menu-item:last-child {
+            border-bottom: 0;
+        }
+
+        .notification-menu-message {
+            font-size: 12px;
+            line-height: 1.4;
+            color: #1f2937;
+            margin-bottom: 3px;
+        }
+
+        .notification-menu-message-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .notification-unread-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #dc2626;
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+
+        .notification-menu-item.unread .notification-menu-message {
+            font-weight: 600;
+        }
+
+        .notification-menu-time {
+            font-size: 11px;
+            color: #64748b;
         }
 
         .profile-menu {
@@ -374,7 +501,7 @@
             margin-left: 250px;
             padding: 30px;
             min-height: calc(100vh - 70px);
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: none;
         }
         
         .main-content.with-sidebar {
@@ -407,8 +534,7 @@
             }
             
             .sidebar.collapsed {
-                transform: translateX(-220px);
-                width: 0;
+                transform: translateX(-100%);
             }
             
             .topbar {
@@ -508,6 +634,10 @@
             .topbar-right {
                 gap: 15px;
             }
+
+            .pagasa-clock {
+                display: none;
+            }
             
             .main-content {
                 margin-top: 60px;
@@ -573,6 +703,11 @@
                 min-width: 170px;
                 font-size: 13px;
             }
+
+            .notification-menu {
+                right: -8px;
+                width: min(320px, calc(100vw - 24px));
+            }
             
             .profile-menu-item {
                 padding: 10px 16px;
@@ -602,7 +737,7 @@
             <img src="{{ asset('DILG-Logo.png') }}" alt="DILG Logo" class="sidebar-logo">
             <div class="sidebar-title">
                 DILG-CAR
-                <small>PDMU OPERATIONS MANAGEMENT SYSTEM (POMS)</small>
+                <small>PDMU OPERATIONS MANAGEMENT SYSTEM (PDMUOMS)</small>
             </div>
             <!-- Close Button for Mobile -->
             <button id="closeSidebarBtn" style="display: none; position: absolute; right: 15px; top: 20px; background: none; border: none; color: white; font-size: 24px; cursor: pointer; width: 40px; height: 40px; padding: 0; border-radius: 6px; transition: all 0.3s ease;" title="Close Menu">
@@ -636,12 +771,18 @@
                             <span>RLIP/LIME-20% Development Fund</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ url('/project-at-risk') }}" class="@if(Route::currentRouteName() == 'projects.at-risk') active @endif">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Project At Risk</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li>
                 <a href="#" class="@if(Route::currentRouteName() == 'reports') active @endif" onclick="toggleSubmenu(event, 'reportsMenu')">
                     <i class="fas fa-file-alt"></i>
-                    <span>Reports</span>
+                    <span>Reportorial Requirements</span>
                     <i class="fas fa-chevron-down" style="margin-left: auto; font-size: 12px;"></i>
                 </a>
                 <ul id="reportsMenu" class="submenu" style="display: none;">
@@ -657,8 +798,47 @@
                             <span>Local Project Monitoring Committee</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('road-maintenance-status.index') }}" class="@if(request()->routeIs('road-maintenance-status.*')) active @endif">
+                            <i class="fas fa-road"></i>
+                            <span>Road Maintenance Status Report</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('rbis-annual-certification.index') }}" class="@if(request()->routeIs('rbis-annual-certification.*')) active @endif">
+                            <i class="fas fa-bridge"></i>
+                            <span>RBIS Annual Certification</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
+            <li>
+                <a href="{{ route('pre-implementation-documents.sbdp') }}" class="@if(Route::currentRouteName() == 'pre-implementation-documents.sbdp') active @endif">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Pre-Implementation Documents(SBDP Projects)</span>
+                </a>
+            </li>
+            @php
+                $isRegionalDilg = strtoupper(trim((string) (Auth::user()->agency ?? ''))) === 'DILG'
+                    && strtolower(trim((string) (Auth::user()->province ?? ''))) === 'regional office';
+            @endphp
+            @if($isRegionalDilg)
+                <li>
+                    <a href="#" class="@if(Route::currentRouteName() == 'system-management.index' || Route::currentRouteName() == 'system-management.upload-subaybayan') active @endif" onclick="toggleSubmenu(event, 'systemManagementMenu')">
+                        <i class="fas fa-cogs"></i>
+                        <span>System Management</span>
+                        <i class="fas fa-chevron-down" style="margin-left: auto; font-size: 12px;"></i>
+                    </a>
+                    <ul id="systemManagementMenu" class="submenu" style="display: none;">
+                        <li>
+                            <a href="{{ route('system-management.upload-subaybayan') }}" class="@if(Route::currentRouteName() == 'system-management.upload-subaybayan') active @endif">
+                                <i class="fas fa-upload"></i>
+                                <span>Upload SubayBAYAN Data</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endif
             @if(Auth::user()->role === 'superadmin')
             <li>
                 <a href="{{ route('users.index') }}" class="@if(Route::currentRouteName() == 'users.index') active @endif">
@@ -684,18 +864,63 @@
                 <div class="profile-icon" id="profileIcon" title="Profile">
                     <i class="fas fa-user"></i>
                 </div>
-                <button class="notification-bell" id="notificationBell" title="Notifications">
-                    <i class="fas fa-bell"></i>
-                    @php
-                        $unreadNotifications = \Illuminate\Support\Facades\DB::table('tbnotifications')
-                            ->where('user_id', Auth::id())
-                            ->whereNull('read_at')
-                            ->count();
-                    @endphp
-                    @if($unreadNotifications > 0)
-                        <span class="notification-badge">{{ $unreadNotifications }}</span>
-                    @endif
-                </button>
+                @php
+                    $unreadNotificationQuery = \Illuminate\Support\Facades\DB::table('tbnotifications')
+                        ->where('user_id', Auth::id())
+                        ->whereNull('read_at');
+                    $unreadNotifications = (clone $unreadNotificationQuery)->count();
+                    $recentNotifications = \Illuminate\Support\Facades\DB::table('tbnotifications')
+                        ->where('user_id', Auth::id())
+                        ->orderByDesc('created_at')
+                        ->limit(12)
+                        ->get(['id', 'message', 'created_at', 'read_at']);
+                @endphp
+                <div class="notification-wrap">
+                    <button
+                        class="notification-bell"
+                        id="notificationBell"
+                        title="Notifications"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        aria-controls="notificationMenu"
+                    >
+                        <i class="fas fa-bell"></i>
+                        @if($unreadNotifications > 0)
+                            <span class="notification-badge">{{ $unreadNotifications }}</span>
+                        @endif
+                    </button>
+                    <div class="notification-menu" id="notificationMenu">
+                        <div class="notification-menu-header">
+                            <span class="notification-menu-title">Notifications</span>
+                            @if($recentNotifications->isNotEmpty())
+                                <form method="POST" action="{{ route('notifications.clear') }}">
+                                    @csrf
+                                    <button type="submit" class="notification-clear-btn">Clear Read</button>
+                                </form>
+                            @endif
+                        </div>
+                        @if($recentNotifications->isEmpty())
+                            <div class="notification-menu-empty">No notifications yet.</div>
+                        @else
+                            @foreach($recentNotifications as $notificationItem)
+                                <a
+                                    href="{{ route('notifications.read', ['id' => $notificationItem->id]) }}"
+                                    class="notification-menu-item {{ is_null($notificationItem->read_at) ? 'unread' : '' }}"
+                                >
+                                    <div class="notification-menu-message-row">
+                                        @if(is_null($notificationItem->read_at))
+                                            <span class="notification-unread-dot" aria-label="Unread notification"></span>
+                                        @endif
+                                        <div class="notification-menu-message">{{ $notificationItem->message }}</div>
+                                    </div>
+                                    <div class="notification-menu-time">
+                                        {{ \Illuminate\Support\Carbon::parse($notificationItem->created_at)->format('M d, Y h:i A') }}
+                                    </div>
+                                </a>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
                 <div class="profile-menu" id="profileMenu">
                     <div class="profile-menu-header">
                         <div class="profile-menu-name">{{ Auth::user()->fname ?? 'User' }} {{ Auth::user()->lname ?? '' }}</div>
@@ -833,6 +1058,7 @@
         const profileIcon = document.getElementById('profileIcon');
         const profileMenu = document.getElementById('profileMenu');
         const notificationBell = document.getElementById('notificationBell');
+        const notificationMenu = document.getElementById('notificationMenu');
         
         // Toggle submenu function
         function toggleSubmenu(event, submenuId) {
@@ -845,6 +1071,24 @@
             profileIcon.addEventListener('click', function(e) {
                 e.stopPropagation();
                 profileMenu.classList.toggle('show');
+                if (notificationMenu) {
+                    notificationMenu.classList.remove('show');
+                }
+                if (notificationBell) {
+                    notificationBell.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+
+        if (notificationBell && notificationMenu) {
+            notificationBell.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                notificationMenu.classList.toggle('show');
+                this.setAttribute('aria-expanded', notificationMenu.classList.contains('show') ? 'true' : 'false');
+                if (profileMenu) {
+                    profileMenu.classList.remove('show');
+                }
             });
         }
 
@@ -852,6 +1096,10 @@
         document.addEventListener('click', function(e) {
             if (profileMenu && profileIcon && !profileMenu.contains(e.target) && !profileIcon.contains(e.target)) {
                 profileMenu.classList.remove('show');
+            }
+            if (notificationMenu && notificationBell && !notificationMenu.contains(e.target) && !notificationBell.contains(e.target)) {
+                notificationMenu.classList.remove('show');
+                notificationBell.setAttribute('aria-expanded', 'false');
             }
         });
 
@@ -926,6 +1174,92 @@
                     e.stopPropagation();
                 }
             }, true);
+        })();
+
+        (function initializeGlobalPagasaClock() {
+            const endpoint = @json(route('pagasa-time.current'));
+            let serverBaseMs = null;
+            let syncedAtMs = null;
+
+            function formatManila(date) {
+                return date.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true,
+                    timeZone: 'Asia/Manila'
+                });
+            }
+
+            function updateGlobalClock(text, color) {
+                document.querySelectorAll('[data-pagasa-global-clock]').forEach((el) => {
+                    el.textContent = text;
+                    el.style.color = color;
+                });
+            }
+
+            function updateTaggedTimeBlocks(isoTime) {
+                document.querySelectorAll('[data-pagasa-time]').forEach((el) => {
+                    // Keep PAGASA time running without rendering the "Current Time" text.
+                    el.dataset.pagasaIso = isoTime;
+                    el.style.display = 'none';
+                    el.textContent = '';
+                });
+            }
+
+            function tick() {
+                if (serverBaseMs === null || syncedAtMs === null) {
+                    return;
+                }
+
+                const now = new Date(serverBaseMs + (Date.now() - syncedAtMs));
+                const formatted = formatManila(now);
+
+                updateGlobalClock(`PAGASA Time: ${formatted}`, '#002C76');
+                updateTaggedTimeBlocks(now.toISOString());
+            }
+
+            async function syncServerTime() {
+                try {
+                    const response = await fetch(endpoint, {
+                        headers: {
+                            Accept: 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const parsedMs = Date.parse(data?.ntp_time ?? '');
+
+                    if (!data?.success || Number.isNaN(parsedMs)) {
+                        throw new Error('Invalid time payload');
+                    }
+
+                    serverBaseMs = parsedMs;
+                    syncedAtMs = Date.now();
+                    tick();
+                } catch (error) {
+                    updateGlobalClock('PAGASA Time unavailable', '#dc2626');
+                    updateTaggedTimeBlocks('');
+                }
+            }
+
+            syncServerTime();
+            setInterval(tick, 1000);
+            setInterval(syncServerTime, 60000);
+
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    syncServerTime();
+                }
+            });
         })();
     </script>
     
