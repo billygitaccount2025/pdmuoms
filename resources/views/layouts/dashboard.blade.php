@@ -135,9 +135,10 @@
         }
         
         .sidebar-menu a.active {
-            background-color: rgba(255, 255, 255, 0.25);
-            color: white;
-            font-weight: 600;
+            background-color: #ffffff;
+            color: #002C76;
+            font-weight: 700;
+            box-shadow: none;
         }
         
         .sidebar-menu i {
@@ -186,9 +187,10 @@
         }
 
         .submenu a.active {
-            background-color: rgba(255, 255, 255, 0.25);
-            color: white;
-            font-weight: 600;
+            background-color: #ffffff;
+            color: #002C76;
+            font-weight: 700;
+            box-shadow: none;
         }
 
         .submenu .submenu {
@@ -887,6 +889,91 @@
                 font-size: 11px;
             }
         }
+
+        .system-dialog-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .system-dialog-modal.is-open {
+            display: flex;
+        }
+
+        .system-dialog-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+        }
+
+        .system-dialog-card {
+            position: relative;
+            z-index: 1;
+            width: min(460px, 100%);
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+        }
+
+        .system-dialog-header {
+            padding: 16px 18px 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .system-dialog-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .system-dialog-body {
+            padding: 14px 18px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #334155;
+        }
+
+        .system-dialog-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 12px 18px 18px;
+        }
+
+        .system-dialog-btn {
+            border: none;
+            border-radius: 8px;
+            padding: 9px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .system-dialog-btn.cancel {
+            background: #e5e7eb;
+            color: #1f2937;
+        }
+
+        .system-dialog-btn.confirm {
+            background: #002c76;
+            color: #ffffff;
+        }
+
+        .system-dialog-btn.error-ok {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        body.system-dialog-open {
+            overflow: hidden;
+        }
     </style>
     
     @yield('styles')
@@ -913,7 +1000,7 @@
                 @endphp
                 <a href="#" class="@if($projectsMenuActive) active @endif submenu-toggle" onclick="toggleSubmenu(event, 'projectsMenu')">
                     <i class="fas fa-project-diagram"></i>
-                    <span>Projects</span>
+                    <span>Project Monitoring</span>
                     <i class="fas fa-chevron-down submenu-chevron" style="margin-left: auto; font-size: 12px;"></i>
                 </a>
                 <ul id="projectsMenu" class="submenu" style="display: {{ $projectsMenuActive ? 'block' : 'none' }};">
@@ -943,7 +1030,7 @@
                     $reportsQuarterlyActive = request()->routeIs('fund-utilization.*')
                         || request()->routeIs('local-project-monitoring-committee.*')
                         || request()->routeIs('road-maintenance-status.*');
-                    $reportsMonthlyActive = request()->routeIs('reports.monthly.pd-no-pbbm-2025-1572-1573');
+                    $reportsMonthlyActive = request()->routeIs('reports.monthly.pd-no-pbbm-2025-1572-1573*');
                     $reportsMenuActive = Route::currentRouteName() == 'reports'
                         || $reportsAnnualActive
                         || $reportsQuarterlyActive
@@ -1005,7 +1092,7 @@
                         </a>
                         <ul id="reportsMonthlyMenu" class="submenu" style="display: {{ $reportsMonthlyActive ? 'block' : 'none' }};">
                             <li>
-                                <a href="{{ route('reports.monthly.pd-no-pbbm-2025-1572-1573') }}" class="@if(request()->routeIs('reports.monthly.pd-no-pbbm-2025-1572-1573')) active @endif">
+                                <a href="{{ route('reports.monthly.pd-no-pbbm-2025-1572-1573') }}" class="@if(request()->routeIs('reports.monthly.pd-no-pbbm-2025-1572-1573*')) active @endif">
                                     <i class="fas fa-file-alt"></i>
                                     <span>Report on PD No. PBBM-2025-1572-1573</span>
                                 </a>
@@ -1155,6 +1242,33 @@
     <main class="main-content" id="mainContent">
         @yield('content')
     </main>
+
+    <div id="globalConfirmModal" class="system-dialog-modal" aria-hidden="true">
+        <div class="system-dialog-backdrop" data-confirm-dismiss></div>
+        <div class="system-dialog-card" role="dialog" aria-modal="true" aria-labelledby="globalConfirmModalTitle">
+            <div class="system-dialog-header">
+                <h3 id="globalConfirmModalTitle" class="system-dialog-title">Please Confirm</h3>
+            </div>
+            <div class="system-dialog-body" id="globalConfirmModalMessage"></div>
+            <div class="system-dialog-actions">
+                <button type="button" class="system-dialog-btn cancel" id="globalConfirmCancelBtn">Cancel</button>
+                <button type="button" class="system-dialog-btn confirm" id="globalConfirmOkBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="globalErrorModal" class="system-dialog-modal" aria-hidden="true">
+        <div class="system-dialog-backdrop" data-error-dismiss></div>
+        <div class="system-dialog-card" role="dialog" aria-modal="true" aria-labelledby="globalErrorModalTitle">
+            <div class="system-dialog-header">
+                <h3 id="globalErrorModalTitle" class="system-dialog-title">System Error</h3>
+            </div>
+            <div class="system-dialog-body" id="globalErrorModalMessage">An unexpected error occurred.</div>
+            <div class="system-dialog-actions">
+                <button type="button" class="system-dialog-btn error-ok" id="globalErrorOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
     
     <script>
         // Sidebar Toggle
@@ -1359,6 +1473,7 @@
         function initializeSidebarSubmenus() {
             const submenuToggles = document.querySelectorAll('.sidebar-menu a.submenu-toggle[onclick*="toggleSubmenu"]');
             const storedOpenSubmenus = readStoredOpenSubmenus();
+            const hasActiveMenuSelection = !!document.querySelector('.sidebar-menu a.active');
 
             submenuToggles.forEach((submenuToggle) => {
                 const onclickExpression = submenuToggle.getAttribute('onclick') || '';
@@ -1387,13 +1502,25 @@
                 const hasInlineOpenState = submenu.style.display === 'block';
                 const hasActiveDescendant = !!submenu.querySelector('a.active');
                 const hasStoredOpenState = storedOpenSubmenus.has(submenu.id);
-                const shouldOpen = hasInlineOpenState || hasActiveDescendant || hasStoredOpenState;
+                const shouldOpen = hasInlineOpenState
+                    || hasActiveDescendant
+                    || (!hasActiveMenuSelection && hasStoredOpenState);
 
                 setSubmenuState(submenu, shouldOpen);
                 if (shouldOpen) {
                     openAncestorSubmenus(submenu);
                 }
             });
+
+            // Keep only the active path expanded, including top-level menus.
+            if (hasActiveMenuSelection) {
+                const activePathSubmenus = Array.from(allSubmenus).filter((submenu) => submenu.querySelector('a.active'));
+                activePathSubmenus.forEach((submenu) => {
+                    setSubmenuState(submenu, true);
+                    openAncestorSubmenus(submenu);
+                    closeSiblingSubmenus(submenu);
+                });
+            }
 
             saveOpenSubmenus();
         }
@@ -1463,6 +1590,154 @@
             }
         });
 
+        (function initializeSystemDialogs() {
+            const confirmModal = document.getElementById('globalConfirmModal');
+            const confirmMessage = document.getElementById('globalConfirmModalMessage');
+            const confirmOkBtn = document.getElementById('globalConfirmOkBtn');
+            const confirmCancelBtn = document.getElementById('globalConfirmCancelBtn');
+            const confirmDismissTargets = document.querySelectorAll('[data-confirm-dismiss]');
+            const errorModal = document.getElementById('globalErrorModal');
+            const errorMessage = document.getElementById('globalErrorModalMessage');
+            const errorOkBtn = document.getElementById('globalErrorOkBtn');
+            const errorDismissTargets = document.querySelectorAll('[data-error-dismiss]');
+            const nativeConfirm = window.confirm.bind(window);
+            let nativeConfirmBypassCount = 0;
+            let confirmCallback = null;
+            let confirmCancelCallback = null;
+
+            function openModal(modal) {
+                if (!modal) return;
+                modal.classList.add('is-open');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('system-dialog-open');
+            }
+
+            function closeModal(modal) {
+                if (!modal) return;
+                modal.classList.remove('is-open');
+                modal.setAttribute('aria-hidden', 'true');
+                if (!document.querySelector('.system-dialog-modal.is-open')) {
+                    document.body.classList.remove('system-dialog-open');
+                }
+            }
+
+            function closeConfirmModal(runCancelCallback) {
+                const shouldRunCancel = runCancelCallback === true;
+                const pendingCancel = confirmCancelCallback;
+                confirmCallback = null;
+                confirmCancelCallback = null;
+                closeModal(confirmModal);
+                if (shouldRunCancel && pendingCancel) {
+                    pendingCancel();
+                }
+            }
+
+            window.openConfirmationModal = function(message, onConfirm, onCancel) {
+                if (!confirmModal || !confirmMessage) return;
+                if (confirmModal.classList.contains('is-open')) {
+                    return;
+                }
+                confirmCallback = typeof onConfirm === 'function' ? onConfirm : null;
+                confirmCancelCallback = typeof onCancel === 'function' ? onCancel : null;
+                confirmMessage.textContent = message || 'Please confirm this action.';
+                openModal(confirmModal);
+                if (confirmOkBtn) {
+                    confirmOkBtn.focus();
+                }
+            };
+
+            window.showSystemErrorModal = function(message) {
+                if (!errorModal || !errorMessage) return;
+                errorMessage.textContent = message || 'An unexpected system error occurred. Please try again.';
+                openModal(errorModal);
+                if (errorOkBtn) {
+                    errorOkBtn.focus();
+                }
+            };
+
+            window.withNativeConfirmBypass = function(callback) {
+                nativeConfirmBypassCount += 1;
+                try {
+                    return callback();
+                } finally {
+                    setTimeout(function() {
+                        nativeConfirmBypassCount = Math.max(nativeConfirmBypassCount - 1, 0);
+                    }, 0);
+                }
+            };
+
+            window.confirm = function(message) {
+                if (nativeConfirmBypassCount > 0) {
+                    nativeConfirmBypassCount -= 1;
+                    return true;
+                }
+                return nativeConfirm(message);
+            };
+
+            if (confirmOkBtn) {
+                confirmOkBtn.addEventListener('click', function() {
+                    const pending = confirmCallback;
+                    closeConfirmModal(false);
+                    if (pending) pending();
+                });
+            }
+
+            if (confirmCancelBtn) {
+                confirmCancelBtn.addEventListener('click', function() {
+                    closeConfirmModal(true);
+                });
+            }
+
+            confirmDismissTargets.forEach((el) => {
+                el.addEventListener('click', function() {
+                    closeConfirmModal(true);
+                });
+            });
+
+            if (errorOkBtn) {
+                errorOkBtn.addEventListener('click', function() {
+                    closeModal(errorModal);
+                });
+            }
+
+            errorDismissTargets.forEach((el) => {
+                el.addEventListener('click', function() {
+                    closeModal(errorModal);
+                });
+            });
+
+            document.addEventListener('keydown', function(event) {
+                if (event.key !== 'Escape') return;
+                if (confirmModal && confirmModal.classList.contains('is-open')) {
+                    closeConfirmModal(true);
+                    return;
+                }
+                if (errorModal && errorModal.classList.contains('is-open')) {
+                    closeModal(errorModal);
+                }
+            });
+
+            const initialError = @json(session('error'));
+            if (initialError) {
+                window.showSystemErrorModal(initialError);
+            }
+
+            window.addEventListener('error', function(event) {
+                const message = (event && event.message) ? event.message : '';
+                if (!message || message === 'Script error.') return;
+                const source = event && typeof event.filename === 'string' ? event.filename : '';
+                const sameOriginSource = !source || source.startsWith(window.location.origin) || source.startsWith('/');
+                if (!sameOriginSource) return;
+                window.showSystemErrorModal(message);
+            });
+
+            window.addEventListener('unhandledrejection', function(event) {
+                const reason = event ? event.reason : null;
+                const message = typeof reason === 'string' ? reason : (reason && reason.message ? reason.message : '');
+                window.showSystemErrorModal(message || 'A background process failed. Please try again.');
+            });
+        })();
+
         // Confirmation for save/update/delete actions
         (function attachActionConfirms() {
             const defaultMessages = {
@@ -1475,23 +1750,28 @@
                 return text;
             }
 
-            function hasInlineConfirm(el) {
-                const onclick = el.getAttribute('onclick') || '';
-                return onclick.includes('confirm(') || onclick.includes('deleteDocument(');
+            function extractInlineConfirmMessage(code) {
+                if (!code) return '';
+                const match = code.match(/confirm\s*\(\s*(['"])(.*?)\1\s*\)/i);
+                return match && match[2] ? match[2] : '';
             }
 
-            function formHasInlineConfirm(el) {
-                const form = el.closest('form');
-                if (!form) return false;
-                const onsubmit = form.getAttribute('onsubmit') || '';
-                return onsubmit.includes('confirm(');
+            function normalizeInlineConfirmHandlers() {
+                document.querySelectorAll('form[onsubmit*="confirm("]').forEach((form) => {
+                    const inlineCode = form.getAttribute('onsubmit') || '';
+                    const message = extractInlineConfirmMessage(inlineCode);
+                    if (message && !form.dataset.confirm) {
+                        form.dataset.confirm = message;
+                    }
+                    form.removeAttribute('onsubmit');
+                });
             }
 
-            function needsAutoConfirm(el) {
+            function needsAutoConfirm(el, form) {
                 if (!el || el.disabled) return false;
                 if (el.dataset && el.dataset.confirmSkip === 'true') return false;
                 if (el.dataset && el.dataset.confirm) return true;
-                if (hasInlineConfirm(el) || formHasInlineConfirm(el)) return false;
+                if (form && form.dataset && form.dataset.confirm) return true;
                 const text = getActionText(el);
                 if (!text) return false;
                 const isSave = text.includes('save');
@@ -1499,40 +1779,91 @@
                 return isSave || isDelete;
             }
 
-            function resolveMessage(el) {
+            function resolveMessage(el, form) {
                 if (el.dataset && el.dataset.confirm) return el.dataset.confirm;
+                if (form && form.dataset && form.dataset.confirm) return form.dataset.confirm;
                 const text = getActionText(el);
                 return text.includes('delete') ? defaultMessages.delete : defaultMessages.save;
             }
 
+            normalizeInlineConfirmHandlers();
+
             document.addEventListener('click', function(e) {
                 const target = e.target.closest('button, input[type="submit"], input[type="button"], a');
                 if (!target) return;
-                if (!needsAutoConfirm(target)) return;
-                const message = resolveMessage(target);
-                if (!window.confirm(message)) {
-                    e.preventDefault();
-                    e.stopPropagation();
+                const form = target.closest('form');
+
+                if (target.dataset && target.dataset.confirmed === 'true') {
+                    delete target.dataset.confirmed;
                     return;
                 }
-                if (target.dataset) {
+
+                if (!needsAutoConfirm(target, form)) return;
+
+                e.preventDefault();
+                e.stopPropagation();
+                const message = resolveMessage(target, form);
+                window.openConfirmationModal(message, function() {
                     target.dataset.confirmed = 'true';
-                }
+                    if (form && (target.type === 'submit' || target.getAttribute('type') === 'submit' || target.tagName === 'BUTTON')) {
+                        window.withNativeConfirmBypass(function() {
+                            if (typeof form.requestSubmit === 'function') {
+                                form.requestSubmit(target);
+                            } else {
+                                form.submit();
+                            }
+                        });
+                        return;
+                    }
+
+                    window.withNativeConfirmBypass(function() {
+                        target.click();
+                    });
+                });
             }, true);
 
             document.addEventListener('submit', function(e) {
                 const submitter = e.submitter;
-                if (!submitter) return;
+                const form = e.target;
+
+                if (form && form.dataset && form.dataset.confirmed === 'true') {
+                    delete form.dataset.confirmed;
+                    return;
+                }
+
+                if (!submitter) {
+                    if (!form || !form.dataset || !form.dataset.confirm) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.openConfirmationModal(form.dataset.confirm, function() {
+                        form.dataset.confirmed = 'true';
+                        window.withNativeConfirmBypass(function() {
+                            form.submit();
+                        });
+                    });
+                    return;
+                }
+
                 if (submitter.dataset && submitter.dataset.confirmed === 'true') {
                     delete submitter.dataset.confirmed;
                     return;
                 }
-                if (!needsAutoConfirm(submitter)) return;
-                const message = resolveMessage(submitter);
-                if (!window.confirm(message)) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
+
+                if (!needsAutoConfirm(submitter, form)) return;
+
+                e.preventDefault();
+                e.stopPropagation();
+                const message = resolveMessage(submitter, form);
+                window.openConfirmationModal(message, function() {
+                    submitter.dataset.confirmed = 'true';
+                    window.withNativeConfirmBypass(function() {
+                        if (typeof form.requestSubmit === 'function') {
+                            form.requestSubmit(submitter);
+                        } else {
+                            form.submit();
+                        }
+                    });
+                });
             }, true);
         })();
 

@@ -28,7 +28,9 @@ Route::get('/reset-password', [App\Http\Controllers\Auth\ForgotPasswordControlle
 Route::post('/reset-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'resetPassword'])->name('forgot-password.reset-submit');
 
 Route::get('/', function () {
-    return redirect('/login');
+    return Auth::check()
+        ? redirect()->route('dashboard')
+        : redirect()->route('login');
 });
 
 // Public API endpoint for municipality projects
@@ -1555,6 +1557,12 @@ Route::middleware(['auth'])->group(function () {
             ->name('system-management.upload-subaybayan');
         Route::post('/system-management/upload-subaybayan/import', [SystemManagementController::class, 'importSubaybayan'])
             ->name('system-management.upload-subaybayan.import');
+        Route::post('/system-management/upload-subaybayan/import/{importId}/load', [SystemManagementController::class, 'loadSubaybayanImport'])
+            ->name('system-management.upload-subaybayan.load');
+        Route::get('/system-management/upload-subaybayan/import/{importId}/download', [SystemManagementController::class, 'downloadSubaybayanImport'])
+            ->name('system-management.upload-subaybayan.download');
+        Route::delete('/system-management/upload-subaybayan/import/{importId}', [SystemManagementController::class, 'deleteSubaybayanImport'])
+            ->name('system-management.upload-subaybayan.delete');
     });
 
     // Local Project Monitoring Committee routes
@@ -1577,9 +1585,16 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('road-maintenance-status', App\Http\Controllers\RoadMaintenanceStatusReportController::class)
         ->parameters(['road-maintenance-status' => 'roadMaintenance']);
 
-    Route::get('/reports/monthly/pd-no-pbbm-2025-1572-1573', function () {
-        return view('reports.monthly.pd-no-pbbm-2025-1572-1573');
-    })->name('reports.monthly.pd-no-pbbm-2025-1572-1573');
+    Route::get('/reports/monthly/pd-no-pbbm-2025-1572-1573', [App\Http\Controllers\PdNoPbbmMonthlyReportController::class, 'index'])
+        ->name('reports.monthly.pd-no-pbbm-2025-1572-1573');
+    Route::get('/reports/monthly/pd-no-pbbm-2025-1572-1573/{office}/edit', [App\Http\Controllers\PdNoPbbmMonthlyReportController::class, 'edit'])
+        ->name('reports.monthly.pd-no-pbbm-2025-1572-1573.edit');
+    Route::post('/reports/monthly/pd-no-pbbm-2025-1572-1573/{office}/upload', [App\Http\Controllers\PdNoPbbmMonthlyReportController::class, 'upload'])
+        ->name('reports.monthly.pd-no-pbbm-2025-1572-1573.upload');
+    Route::post('/reports/monthly/pd-no-pbbm-2025-1572-1573/{office}/approve/{docId}', [App\Http\Controllers\PdNoPbbmMonthlyReportController::class, 'approveDocument'])
+        ->name('reports.monthly.pd-no-pbbm-2025-1572-1573.approve');
+    Route::get('/reports/monthly/pd-no-pbbm-2025-1572-1573/{office}/document/{docId}', [App\Http\Controllers\PdNoPbbmMonthlyReportController::class, 'viewDocument'])
+        ->name('reports.monthly.pd-no-pbbm-2025-1572-1573.document');
 
     Route::get('/reports/rbis-annual-certification', [App\Http\Controllers\RbisAnnualCertificationController::class, 'index'])
         ->name('rbis-annual-certification.index');
