@@ -233,7 +233,7 @@
     <div class="login-container">
         <img src="/DILG-Logo.png" alt="DILG Logo" style="display: block; margin: 0 auto 8px; width: 100px;">
         <h2>Project Development and Management Unit</h2>
-        <h3>Operations Management System (POMS)</h3>
+        <h3>Operations Management System (PDMUOMS)</h3>
         @php
             $showOtp = ($showOtp ?? false) || session()->has('otp_email');
             $emailValue = session('otp_email', old('email'));
