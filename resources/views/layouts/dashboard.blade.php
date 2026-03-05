@@ -943,7 +943,7 @@
                     $reportsQuarterlyActive = request()->routeIs('fund-utilization.*')
                         || request()->routeIs('local-project-monitoring-committee.*')
                         || request()->routeIs('road-maintenance-status.*');
-                    $reportsMonthlyActive = false;
+                    $reportsMonthlyActive = request()->routeIs('reports.monthly.pd-no-pbbm-2025-1572-1573');
                     $reportsMenuActive = Route::currentRouteName() == 'reports'
                         || $reportsAnnualActive
                         || $reportsQuarterlyActive
@@ -995,12 +995,6 @@
                                     <span>Road Maintenance Status Report</span>
                                 </a>
                             </li>
-                            <li>
-                                <a href="#" onclick="event.preventDefault();">
-                                    <i class="fas fa-file-signature"></i>
-                                    <span>RPMES Form 2</span>
-                                </a>
-                            </li>
                         </ul>
                     </li>
                     <li>
@@ -1011,7 +1005,10 @@
                         </a>
                         <ul id="reportsMonthlyMenu" class="submenu" style="display: {{ $reportsMonthlyActive ? 'block' : 'none' }};">
                             <li>
-                                <span class="submenu-empty">No monthly report available yet.</span>
+                                <a href="{{ route('reports.monthly.pd-no-pbbm-2025-1572-1573') }}" class="@if(request()->routeIs('reports.monthly.pd-no-pbbm-2025-1572-1573')) active @endif">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span>Report on PD No. PBBM-2025-1572-1573</span>
+                                </a>
                             </li>
                         </ul>
                     </li>

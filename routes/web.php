@@ -1577,6 +1577,10 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('road-maintenance-status', App\Http\Controllers\RoadMaintenanceStatusReportController::class)
         ->parameters(['road-maintenance-status' => 'roadMaintenance']);
 
+    Route::get('/reports/monthly/pd-no-pbbm-2025-1572-1573', function () {
+        return view('reports.monthly.pd-no-pbbm-2025-1572-1573');
+    })->name('reports.monthly.pd-no-pbbm-2025-1572-1573');
+
     Route::get('/reports/rbis-annual-certification', [App\Http\Controllers\RbisAnnualCertificationController::class, 'index'])
         ->name('rbis-annual-certification.index');
     Route::get('/reports/rbis-annual-certification/{office}/edit', [App\Http\Controllers\RbisAnnualCertificationController::class, 'edit'])
@@ -1588,4 +1592,3 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reports/rbis-annual-certification/{office}/document/{docId}', [App\Http\Controllers\RbisAnnualCertificationController::class, 'viewDocument'])
         ->name('rbis-annual-certification.document');
 });
-
