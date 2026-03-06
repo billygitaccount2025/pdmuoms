@@ -1148,7 +1148,12 @@
             <button class="toggle-btn" id="toggleBtn" title="Toggle Sidebar">
                 <i class="fas fa-bars"></i>
             </button>
-            <h1 class="topbar-title" id="pageTitle">@yield('page-title', 'Dashboard')</h1>
+            @php
+                $topbarPageTitle = trim((string) $__env->yieldContent('page-title', 'Dashboard'));
+            @endphp
+            @if ($topbarPageTitle !== 'Locally Funded Projects')
+                <h1 class="topbar-title" id="pageTitle">{{ $topbarPageTitle }}</h1>
+            @endif
         </div>
         
         <div class="topbar-right">

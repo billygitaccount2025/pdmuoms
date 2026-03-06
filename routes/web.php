@@ -377,6 +377,12 @@ Route::middleware(['auth'])->group(function () {
             $projectsWithBalance = collect();
             $financialStatusProjects = collect();
             $utilizationPercentage = 0.0;
+            $expectedCompletionMonthLabel = now()->format('F Y');
+            $currentYear = now()->year;
+            $currentMonth = now()->month;
+            $currentMonthStart = now()->copy()->startOfMonth()->toDateString();
+            $currentMonthEnd = now()->copy()->endOfMonth()->toDateString();
+            $projectsExpectedCompletionThisMonth = collect();
             $projectAtRiskOrder = ['Ahead', 'No Risk', 'On Schedule', 'High Risk', 'Moderate Risk', 'Low Risk'];
             $projectAtRiskAgingOrder = ['High Risk', 'Low Risk', 'No Risk'];
             $projectUpdateStatusOrder = ['High Risk', 'Low Risk', 'No Risk'];
@@ -788,6 +794,28 @@ Route::middleware(['auth'])->group(function () {
                 )
             ";
 
+            $expectedCompletionParsedDateExpression = "
+                COALESCE(
+                    IF(
+                        TRIM(COALESCE(spp.intended_completion_date_2, '')) REGEXP '^[0-9]+(\\.[0-9]+)?$',
+                        DATE_ADD('1899-12-30', INTERVAL FLOOR(CAST(TRIM(COALESCE(spp.intended_completion_date_2, '')) AS DECIMAL(12,4))) DAY),
+                        NULL
+                    ),
+                    STR_TO_DATE(TRIM(COALESCE(spp.intended_completion_date_2, '')), '%Y-%m-%d'),
+                    STR_TO_DATE(TRIM(COALESCE(spp.intended_completion_date_2, '')), '%Y-%m-%d %H:%i:%s'),
+                    STR_TO_DATE(TRIM(COALESCE(spp.intended_completion_date_2, '')), '%m/%d/%Y'),
+                    STR_TO_DATE(TRIM(COALESCE(spp.intended_completion_date_2, '')), '%m/%d/%Y %H:%i'),
+                    STR_TO_DATE(TRIM(COALESCE(spp.intended_completion_date_2, '')), '%m/%d/%Y %H:%i:%s'),
+                    STR_TO_DATE(TRIM(COALESCE(spp.intended_completion_date_2, '')), '%m/%d/%Y %h:%i:%s %p'),
+                    STR_TO_DATE(TRIM(COALESCE(spp.intended_completion_date_2, '')), '%m/%d/%y'),
+                    STR_TO_DATE(TRIM(COALESCE(spp.intended_completion_date_2, '')), '%d/%m/%Y'),
+                    STR_TO_DATE(TRIM(COALESCE(spp.intended_completion_date_2, '')), '%d-%m-%Y'),
+                    STR_TO_DATE(TRIM(COALESCE(spp.intended_completion_date_2, '')), '%d-%b-%Y'),
+                    STR_TO_DATE(TRIM(COALESCE(spp.intended_completion_date_2, '')), '%b %e, %Y'),
+                    STR_TO_DATE(TRIM(COALESCE(spp.intended_completion_date_2, '')), '%M %e, %Y')
+                )
+            ";
+
             $computeProjectUpdateStatusCountsFromSubay = function ($subayQuery, array &$targetCounts) use ($projectUpdateStatusParsedDateExpression) {
 
                 $latestProjectDatesQuery = (clone $subayQuery)
@@ -997,6 +1025,23 @@ Route::middleware(['auth'])->group(function () {
                 $utilizationPercentage = $totalObligationAmount > 0
                     ? (($totalDisbursementAmount / $totalObligationAmount) * 100)
                     : 0.0;
+
+                $projectsExpectedCompletionBaseQuery = (clone $subayDashboardQuery)
+                    ->selectRaw('UPPER(TRIM(spp.project_code)) as project_code')
+                    ->selectRaw('MAX(TRIM(COALESCE(spp.project_title, ""))) as project_title')
+                    ->selectRaw('MAX(TRIM(COALESCE(spp.province, ""))) as province')
+                    ->selectRaw('MAX(TRIM(COALESCE(spp.city_municipality, ""))) as city_municipality')
+                    ->selectRaw("MAX({$expectedCompletionParsedDateExpression}) as expected_completion_date")
+                    ->groupBy(DB::raw('UPPER(TRIM(spp.project_code))'));
+
+                $projectsExpectedCompletionThisMonth = DB::query()
+                    ->fromSub($projectsExpectedCompletionBaseQuery, 'due_projects')
+                    ->whereNotNull('due_projects.expected_completion_date')
+                    ->whereYear('due_projects.expected_completion_date', $currentYear)
+                    ->whereMonth('due_projects.expected_completion_date', $currentMonth)
+                    ->orderBy('due_projects.expected_completion_date')
+                    ->orderBy('due_projects.project_code')
+                    ->get();
 
                 $fundSourceFromProjectCodeExpr = "
                     CASE
@@ -1324,6 +1369,18 @@ Route::middleware(['auth'])->group(function () {
                     ? (($totalDisbursementAmount / $totalObligationAmount) * 100)
                     : 0.0;
 
+                $projectsExpectedCompletionThisMonth = (clone $fallbackQuery)
+                    ->selectRaw('UPPER(TRIM(COALESCE(subaybayan_project_code, ""))) as project_code')
+                    ->selectRaw('MAX(TRIM(COALESCE(project_name, ""))) as project_title')
+                    ->selectRaw('MAX(TRIM(COALESCE(province, ""))) as province')
+                    ->selectRaw('MAX(TRIM(COALESCE(city_municipality, ""))) as city_municipality')
+                    ->selectRaw('MAX(target_date_completion) as expected_completion_date')
+                    ->groupBy(DB::raw('UPPER(TRIM(COALESCE(subaybayan_project_code, "")))'))
+                    ->havingRaw('MAX(target_date_completion) BETWEEN ? AND ?', [$currentMonthStart, $currentMonthEnd])
+                    ->orderByRaw('MAX(target_date_completion) ASC')
+                    ->orderByRaw('UPPER(TRIM(COALESCE(subaybayan_project_code, "")))')
+                    ->get();
+
                 $financialStatusProjects = (clone $fallbackQuery)
                     ->selectRaw('UPPER(TRIM(COALESCE(subaybayan_project_code, ""))) as project_code')
                     ->selectRaw('TRIM(COALESCE(project_name, "")) as project_title')
@@ -1458,6 +1515,8 @@ Route::middleware(['auth'])->group(function () {
                 'totalDisbursementAmount',
                 'totalBalanceAmount',
                 'utilizationPercentage',
+                'expectedCompletionMonthLabel',
+                'projectsExpectedCompletionThisMonth',
                 'projectAtRiskCounts',
                 'projectAtRiskAgingCounts',
                 'projectAtRiskAgingProjects',

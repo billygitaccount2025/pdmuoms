@@ -579,6 +579,73 @@
             </div>
         </div>
 
+        <div class="dashboard-card expected-completion-card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); height: 583px; display: flex; flex-direction: column;">
+            @php
+                $dueProjects = $projectsExpectedCompletionThisMonth ?? collect();
+            @endphp
+            <h2 style="color: #002C76; font-size: 16px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px;">
+                <span style="width: 22px; height: 22px; border-radius: 999px; background-color: #dbeafe; color: #2563eb; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">
+                    <i class="fas fa-calendar-check"></i>
+                </span>
+                PROJECTS EXPECTED TO BE COMPLETED ({{ strtoupper((string) ($expectedCompletionMonthLabel ?? now()->format('F Y'))) }})
+            </h2>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px;">
+            </div>
+
+            @if ($dueProjects->isEmpty())
+                <div style="padding: 14px; border: 1px dashed #bfdbfe; border-radius: 8px; background-color: #f8fbff; color: #1e3a8a; font-size: 13px;">
+                    No projects are scheduled for completion this month.
+                </div>
+            @else
+                <div class="expected-completion-list">
+                    @foreach ($dueProjects as $dueProject)
+                        @php
+                            $projectCode = trim((string) ($dueProject->project_code ?? ''));
+                            $projectTitle = trim((string) ($dueProject->project_title ?? ''));
+                            $province = trim((string) ($dueProject->province ?? ''));
+                            $cityMunicipality = trim((string) ($dueProject->city_municipality ?? ''));
+                            $locationLabel = implode(' | ', array_values(array_filter([$province, $cityMunicipality], function ($value) {
+                                return $value !== '';
+                            })));
+                            $completionDateLabel = 'N/A';
+
+                            if (!empty($dueProject->expected_completion_date)) {
+                                try {
+                                    $completionDateLabel = \Illuminate\Support\Carbon::parse($dueProject->expected_completion_date)->format('M d, Y');
+                                } catch (\Throwable $error) {
+                                    $completionDateLabel = (string) $dueProject->expected_completion_date;
+                                }
+                            }
+
+                            $searchTerm = $projectCode !== '' ? $projectCode : $projectTitle;
+                        @endphp
+                        <div
+                            @class([
+                                'expected-completion-item',
+                                'clickable-dashboard-card' => $searchTerm !== '',
+                            ])
+                            @if ($searchTerm !== '')
+                                data-card-url="{{ route('projects.locally-funded', ['search' => $searchTerm]) }}"
+                            @endif
+                        >
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                                <div class="expected-completion-item-code">{{ $projectCode !== '' ? $projectCode : 'NO PROJECT CODE' }}</div>
+                                <div class="expected-completion-item-date">{{ $completionDateLabel }}</div>
+                            </div>
+                            <div class="expected-completion-item-title">{{ $projectTitle !== '' ? $projectTitle : 'Untitled project' }}</div>
+                            @if ($locationLabel !== '')
+                                <div class="expected-completion-item-location">
+                                    <i class="fas fa-location-dot" aria-hidden="true"></i>
+                                    <span>{{ $locationLabel }}</span>
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
         <div class="dashboard-card status-subaybayan-card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <h2 style="color: #002C76; font-size: 16px; margin: 0 0 16px; display: flex; align-items: center; gap: 8px;">
                 <span style="width: 22px; height: 22px; border-radius: 999px; background-color: #e0f2fe; color: #0ea5e9; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">
@@ -2073,6 +2140,10 @@
             order: 4;
         }
 
+        .dashboard-top-cards .expected-completion-card {
+            order: 5;
+        }
+
         .dashboard-top-cards .status-subaybayan-card {
             order: 3;
         }
@@ -2683,6 +2754,53 @@
 
         .project-risk-slippage-card .project-risk-legend {
             margin-top: 5px;
+        }
+
+        .expected-completion-list {
+            display: grid;
+            gap: 10px;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .expected-completion-item {
+            padding: 10px 12px;
+            border: 1px solid #dbeafe;
+            border-radius: 8px;
+            background-color: #f8fbff;
+        }
+
+        .expected-completion-item-code {
+            font-size: 12px;
+            font-weight: 700;
+            color: #1e3a8a;
+            line-height: 1.25;
+        }
+
+        .expected-completion-item-date {
+            font-size: 12px;
+            font-weight: 600;
+            color: #0f766e;
+            line-height: 1.25;
+        }
+
+        .expected-completion-item-title {
+            margin-top: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            line-height: 1.35;
+        }
+
+        .expected-completion-item-location {
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #64748b;
         }
 
         .financial-status-card .financial-metrics-layout {
