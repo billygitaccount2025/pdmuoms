@@ -179,6 +179,7 @@
         </div>
     </form>
 
+<<<<<<< HEAD
     <div class="dashboard-main-layout">
         <div class="dashboard-top-cards" style="display: grid; gap: 20px; margin-bottom: 0;">
             <div class="dashboard-card total-projects-card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; flex-direction: column;">
@@ -284,6 +285,26 @@
             </div>
         @endif
 
+=======
+    <div class="dashboard-top-cards" style="display: grid; gap: 20px; margin-bottom: 24px;">
+        <div class="dashboard-card total-projects-card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; flex-direction: column;">
+            <h2 style="color: #002C76; font-size: 16px; margin: 0 0 16px; display: flex; align-items: center; gap: 8px;">
+                <span style="width: 22px; height: 22px; border-radius: 999px; background-color: #e0f2fe; color: #0ea5e9; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">
+                    <i class="fas fa-project-diagram"></i>
+                </span>
+                TOTAL PROJECTS
+            </h2>
+            <div class="dashboard-tile clickable-dashboard-card" data-card-url="{{ route('projects.locally-funded') }}" style="padding: 12px; border: 1px solid #e5e7eb; border-radius: 6px; background-color: #f9fafb; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; font-weight: 600; color: #6b7280; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em;">
+                    <span style="width: 20px; height: 20px; border-radius: 999px; background-color: #e5e7eb; color: #4b5563; display: inline-flex; align-items: center; justify-content: center; font-size: 10px;">
+                        <i class="fas fa-hashtag"></i>
+                    </span>
+                    Total Number of Projects
+                </div>
+                <div style="font-size: 36px; font-weight: 700; color: #002C76; text-align: center;">{{ $totalProjects }}</div>
+            </div>
+        </div>
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
         <div class="dashboard-card financial-status-card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <h2 style="color: #002C76; font-size: 16px; margin: 0 0 16px; display: flex; align-items: center; gap: 8px;">
                 <span style="width: 22px; height: 22px; border-radius: 999px; background-color: #e0f2fe; color: #0ea5e9; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">
@@ -586,7 +607,11 @@
                 </span>
                 STATUS OF PROJECT (SUBAYBAYAN STATUS)
             </h2>
+<<<<<<< HEAD
             <div class="status-subaybayan-grid" style="display: grid; grid-template-columns: repeat(3, minmax(140px, 1fr)); gap: 12px;">
+=======
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(140px, 1fr)); gap: 12px;">
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                 @foreach($statusSubaybayanCounts as $status => $count)
                     @php
                         $iconConfig = $statusIconMap[$status] ?? ['icon' => 'fa-circle-info', 'color' => '#6b7280', 'bg' => '#f3f4f6', 'tileBg' => '#f9fafb', 'tileBorder' => '#e5e7eb', 'labelColor' => '#6b7280'];
@@ -644,6 +669,7 @@
             </div>
         </div>
 
+<<<<<<< HEAD
     </div>
 
     @php
@@ -881,6 +907,259 @@
                         </div>
                     </div>
                 </div>
+=======
+        @if (!empty($fundSourceCounts) && $fundSourceCounts->count() > 0)
+            @php
+                $fundSourceColumns = max(1, (int) ceil($fundSourceCounts->count() / 2));
+            @endphp
+            <div class="dashboard-card fund-source-card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h2 style="color: #002C76; font-size: 16px; margin: 0 0 16px; display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 22px; height: 22px; border-radius: 999px; background-color: #e0f2fe; color: #0ea5e9; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">
+                        <i class="fas fa-layer-group"></i>
+                    </span>
+                    PROJECTS BY FUND SOURCE
+                </h2>
+                <div
+                    class="fund-source-grid"
+                    @style([
+                        'display: grid',
+                        'grid-template-columns: repeat(' . $fundSourceColumns . ', minmax(120px, 1fr))',
+                        'gap: 12px',
+                    ])
+                >
+                    @foreach ($fundSourceCounts as $fundSource => $count)
+                        @php
+                            $fundSourceIcon = $fundSourceIconMap[$fundSource] ?? 'fa-coins';
+                            $fundSourceStyles = $fundSourceStyleMap[$fundSource] ?? ['bg' => '#f9fafb', 'border' => '#e5e7eb', 'iconBg' => '#e5e7eb', 'iconColor' => '#4b5563', 'labelColor' => '#6b7280'];
+                            $fundSourceModalKey = trim((string) preg_replace('/[^a-z0-9]+/i', '-', (string) $fundSource), '-');
+                            $fundSourceModalId = 'fund-source-' . ($fundSourceModalKey !== '' ? $fundSourceModalKey : 'unspecified') . '-modal';
+                            $projectCodeKeyword = strtoupper(trim((string) $fundSource)) === 'FALGU'
+                                ? 'FA'
+                                : $fundSource;
+                            $fundSourceFilterUrl = route('projects.locally-funded', [
+                                'search' => $fundSource,
+                                'fund_source' => $fundSource,
+                                'project_code' => $projectCodeKeyword,
+                            ]);
+                        @endphp
+                        <div
+                            class="dashboard-tile fund-source-link-tile clickable-dashboard-card"
+                            data-card-url="{{ $fundSourceFilterUrl }}"
+                            data-modal-target="{{ $fundSourceModalId }}"
+                            @style([
+                                'padding: 12px',
+                                'border: 1px solid ' . $fundSourceStyles['border'],
+                                'border-radius: 6px',
+                                'background-color: ' . $fundSourceStyles['bg'],
+                                'text-align: center',
+                                'color: inherit',
+                                'display: block',
+                            ])
+                        >
+                            <div
+                                @style([
+                                    'display: flex',
+                                    'align-items: center',
+                                    'justify-content: center',
+                                    'gap: 8px',
+                                    'font-size: 13px',
+                                    'font-weight: 600',
+                                    'color: ' . $fundSourceStyles['labelColor'],
+                                    'margin-bottom: 6px',
+                                    'text-transform: uppercase',
+                                    'letter-spacing: 0.04em',
+                                ])
+                            >
+                                <span
+                                    @style([
+                                        'width: 20px',
+                                        'height: 20px',
+                                        'border-radius: 999px',
+                                        'background-color: ' . $fundSourceStyles['iconBg'],
+                                        'color: ' . $fundSourceStyles['iconColor'],
+                                        'display: inline-flex',
+                                        'align-items: center',
+                                        'justify-content: center',
+                                        'font-size: 10px',
+                                    ])
+                                >
+                                    <i class="fas {{ $fundSourceIcon }}"></i>
+                                </span>
+                                {{ $fundSource }}
+                            </div>
+                            <div style="font-size: 20px; font-weight: 700; color: #002C76;">{{ $count }}</div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+    </div>
+
+    @php
+        $projectAtRiskChartOrder = ['Ahead', 'No Risk', 'On Schedule', 'High Risk', 'Moderate Risk', 'Low Risk'];
+        $projectAtRiskSummaryOrder = ['Ahead', 'High Risk', 'Moderate Risk', 'Low Risk', 'No Risk', 'On Schedule'];
+        $projectAtRiskLegendOrder = ['Ahead', 'On Schedule', 'No Risk', 'Low Risk', 'Moderate Risk', 'High Risk'];
+        $projectAtRiskStyles = [
+            'Ahead' => ['bg' => '#3f9142', 'badgeBg' => '#dcfce7', 'badgeColor' => '#166534'],
+            'No Risk' => ['bg' => '#2f84cf', 'badgeBg' => '#dbeafe', 'badgeColor' => '#1d4ed8'],
+            'On Schedule' => ['bg' => '#a3a3a3', 'badgeBg' => '#f3f4f6', 'badgeColor' => '#4b5563'],
+            'High Risk' => ['bg' => '#c81d1d', 'badgeBg' => '#fee2e2', 'badgeColor' => '#b91c1c'],
+            'Moderate Risk' => ['bg' => '#fb6f41', 'badgeBg' => '#ffedd5', 'badgeColor' => '#c2410c'],
+            'Low Risk' => ['bg' => '#f6c000', 'badgeBg' => '#fef3c7', 'badgeColor' => '#b45309'],
+        ];
+        $projectAtRiskCriteria = [
+            'Ahead' => 'Slippage is greater than 0%',
+            'On Schedule' => 'Slippage is exactly 0%',
+            'No Risk' => 'Slippage is from -0.01% to -4.99%',
+            'Low Risk' => 'Slippage is from -5% to -9.99%',
+            'Moderate Risk' => 'Slippage is from -10% to -14.99%',
+            'High Risk' => 'Slippage is at or below -15%',
+        ];
+        $projectAtRiskAgingChartOrder = ['High Risk', 'Low Risk', 'No Risk'];
+        $projectAtRiskAgingSummaryOrder = ['High Risk', 'Low Risk', 'No Risk'];
+        $projectAtRiskAgingLegendOrder = ['High Risk', 'Low Risk', 'No Risk'];
+        $projectAtRiskAgingStyles = [
+            'High Risk' => ['bg' => '#c81d1d', 'badgeBg' => '#fee2e2', 'badgeColor' => '#b91c1c'],
+            'Low Risk' => ['bg' => '#f59e0b', 'badgeBg' => '#fef3c7', 'badgeColor' => '#b45309'],
+            'No Risk' => ['bg' => '#16a34a', 'badgeBg' => '#dcfce7', 'badgeColor' => '#15803d'],
+        ];
+        $projectAtRiskAgingCriteria = [
+            'High Risk' => 'Aging is greater than or equal to 60 days',
+            'Low Risk' => 'Aging is greater than 30 days but less than 60 days',
+            'No Risk' => 'Aging is less than or equal to 30 days',
+        ];
+        $projectUpdateStatusOrder = ['High Risk', 'Low Risk', 'No Risk'];
+        $projectUpdateStatusStyles = [
+            'High Risk' => ['bg' => '#dc2626', 'badgeBg' => '#fee2e2', 'badgeColor' => '#b91c1c'],
+            'Low Risk' => ['bg' => '#f59e0b', 'badgeBg' => '#fef3c7', 'badgeColor' => '#b45309'],
+            'No Risk' => ['bg' => '#16a34a', 'badgeBg' => '#dcfce7', 'badgeColor' => '#15803d'],
+        ];
+        $projectUpdateStatusCriteria = [
+            'High Risk' => 'For projects that are not completed, aging is greater than or equal to 60 days',
+            'Low Risk' => 'For projects that are not completed, aging is greater than 30 days but less than 60 days',
+            'No Risk' => 'For projects that are not completed, aging is less than or equal to 30 days',
+        ];
+        $projectUpdateStatusTotal = 0;
+        foreach ($projectUpdateStatusOrder as $riskLabel) {
+            $projectUpdateStatusTotal += (int) ($projectUpdateStatusCounts[$riskLabel] ?? 0);
+        }
+        $projectUpdateAllStatusModalId = 'project-update-all-status-modal';
+        $projectUpdateAllStatusModalTitleId = $projectUpdateAllStatusModalId . '-title';
+        $projectUpdateAllStatusModalSubtitle = 'Projects that are not completed, grouped into High Risk, Low Risk, and No Risk based on aging from SubayBAYAN date up to today.';
+    @endphp
+
+    <div class="dashboard-status-row" style="display: grid; gap: 20px;">
+        <div class="dashboard-status-stack">
+            <div class="dashboard-card project-update-status-card" style="background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h2 style="color: #b91c1c; font-size: 14px; margin: 0 0 10px; display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 18px; height: 18px; border-radius: 999px; background-color: #fee2e2; color: #dc2626; display: inline-flex; align-items: center; justify-content: center; font-size: 9px;">
+                        <i class="fas fa-calendar-check"></i>
+                    </span>
+                    <span class="dashboard-card-title-with-info">
+                        <span>PROJECT UPDATE STATUS DASHBOARD</span>
+                        <span class="dashboard-info-tooltip-wrap">
+                            <button type="button" class="dashboard-info-tooltip-trigger" aria-label="Show project update status legend" title="Show project update status legend">
+                                <i class="fas fa-info-circle" aria-hidden="true"></i>
+                            </button>
+                            <div class="dashboard-info-tooltip" role="tooltip">
+                                <div class="dashboard-info-tooltip-title">Legend</div>
+                                @foreach ($projectUpdateStatusOrder as $riskLabel)
+                                    @php
+                                        $riskStyle = $projectUpdateStatusStyles[$riskLabel] ?? ['bg' => '#6b7280', 'badgeColor' => '#374151'];
+                                        $criteriaText = $projectUpdateStatusCriteria[$riskLabel] ?? '';
+                                    @endphp
+                                    <div class="dashboard-info-tooltip-item">
+                                        <span class="dashboard-info-tooltip-dot" @style(['background-color: ' . $riskStyle['bg']])></span>
+                                        <div class="dashboard-info-tooltip-text">
+                                            <strong @style(['color: ' . $riskStyle['badgeColor']])>{{ $riskLabel }}:</strong> {{ $criteriaText }}
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </span>
+                    </span>
+                </h2>
+                <p class="project-update-status-description">
+                    This dashboard shows the aging of ongoing projects.
+                </p>
+                <div class="project-update-status-chart">
+                    @php
+                        $projectUpdateStatusPieSegments = [];
+                        $projectUpdateStatusGapPercent = 0.8;
+
+                        if ($projectUpdateStatusTotal > 0) {
+                            $projectUpdateStatusBaseSegments = [];
+                            foreach ($projectUpdateStatusOrder as $riskLabel) {
+                                $riskCount = (int) ($projectUpdateStatusCounts[$riskLabel] ?? 0);
+                                if ($riskCount < 1) {
+                                    continue;
+                                }
+
+                                $riskStyle = $projectUpdateStatusStyles[$riskLabel] ?? ['bg' => '#6b7280'];
+                                $projectUpdateStatusBaseSegments[] = [
+                                    'label' => $riskLabel,
+                                    'count' => $riskCount,
+                                    'color' => $riskStyle['bg'],
+                                ];
+                            }
+
+                            $projectUpdateStatusSegmentCount = count($projectUpdateStatusBaseSegments);
+                            $projectUpdateStatusGapPercent = $projectUpdateStatusSegmentCount > 1 ? 0.8 : 0.0;
+                            $projectUpdateStatusAvailablePercent = max(
+                                0.0,
+                                100.0 - ($projectUpdateStatusSegmentCount * $projectUpdateStatusGapPercent)
+                            );
+                            $projectUpdateStatusRunningPercent = 0.0;
+
+                            foreach ($projectUpdateStatusBaseSegments as $segment) {
+                                $segmentRawPercent = ($segment['count'] / $projectUpdateStatusTotal) * 100;
+                                $segmentLength = ($segmentRawPercent / 100) * $projectUpdateStatusAvailablePercent;
+                                if ($segmentLength <= 0.01) {
+                                    continue;
+                                }
+
+                                $projectUpdateStatusPieSegments[] = [
+                                    'start' => $projectUpdateStatusRunningPercent,
+                                    'length' => $segmentLength,
+                                    'color' => $segment['color'],
+                                    'label' => $segment['label'],
+                                    'percentage' => $segmentRawPercent,
+                                ];
+
+                                $projectUpdateStatusRunningPercent += $segmentLength + $projectUpdateStatusGapPercent;
+                            }
+                        }
+                    @endphp
+                    <div class="project-update-status-pie-layout">
+                        <div
+                            class="project-update-status-pie-wrap clickable-dashboard-card"
+                            data-card-url="{{ route('projects.locally-funded') }}"
+                            data-modal-target="{{ $projectUpdateAllStatusModalId }}"
+                            aria-label="Open project update status project list"
+                        >
+                            <svg class="project-update-status-pie" viewBox="0 0 100 100" aria-label="Project update status donut chart">
+                                <circle class="project-update-status-pie-track" cx="50" cy="50" r="36" pathLength="100"></circle>
+                                @foreach ($projectUpdateStatusPieSegments as $segment)
+                                    <circle
+                                        class="project-update-status-pie-segment"
+                                        cx="50"
+                                        cy="50"
+                                        r="36"
+                                        pathLength="100"
+                                        @style([
+                                            'stroke: ' . $segment['color'],
+                                            'stroke-dasharray: ' . number_format($segment['length'], 4, '.', '') . ' 100',
+                                            'stroke-dashoffset: -' . number_format($segment['start'], 4, '.', ''),
+                                        ])
+                                    >
+                                        <title>{{ $segment['label'] }}: {{ number_format($segment['percentage'], 2) }}%</title>
+                                    </circle>
+                                @endforeach
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                 <div class="project-update-status-grid">
                     @foreach ($projectUpdateStatusOrder as $riskLabel)
                         @php
@@ -955,10 +1234,13 @@
                     }
 
                     $projectAtRiskDonutSegments = [];
+<<<<<<< HEAD
                     $projectAtRiskSweepDurationMs = 1400.0;
                     $projectAtRiskMinSegmentDurationMs = 120.0;
                     $projectAtRiskCalloutStepMs = 140.0;
                     $projectAtRiskSweepEndMs = 0.0;
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
 
                     if ($projectAtRiskTotal > 0) {
                         $projectAtRiskBaseSegments = [];
@@ -987,6 +1269,7 @@
                             if ($segmentLength <= 0.01) {
                                 continue;
                             }
+<<<<<<< HEAD
                             $segmentDelayMs = ($projectAtRiskRunningPercent / 100) * $projectAtRiskSweepDurationMs;
                             $segmentDurationMs = max(
                                 $projectAtRiskMinSegmentDurationMs,
@@ -996,21 +1279,28 @@
                                 $projectAtRiskSweepEndMs,
                                 $segmentDelayMs + $segmentDurationMs
                             );
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
 
                             $projectAtRiskDonutSegments[] = [
                                 'start' => $projectAtRiskRunningPercent,
                                 'length' => $segmentLength,
                                 'color' => $segment['color'],
                                 'label' => $segment['label'],
+<<<<<<< HEAD
                                 'count' => $segment['count'],
                                 'percentage' => $segmentRawPercent,
                                 'segmentDelayMs' => $segmentDelayMs,
                                 'segmentDurationMs' => $segmentDurationMs,
+=======
+                                'percentage' => $segmentRawPercent,
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                             ];
 
                             $projectAtRiskRunningPercent += $segmentLength + $projectAtRiskGapPercent;
                         }
                     }
+<<<<<<< HEAD
                     $projectAtRiskCalloutStartDelayMs = $projectAtRiskSweepEndMs + 120.0;
                 @endphp
                 <div class="project-risk-donut-wrap">
@@ -1032,6 +1322,13 @@
                                 $segmentHoverX = $segmentHoverOffset * cos($segmentMidRadians);
                                 $segmentHoverY = $segmentHoverOffset * sin($segmentMidRadians);
                             @endphp
+=======
+                @endphp
+                <div class="project-risk-donut-wrap">
+                    <svg class="project-risk-donut" viewBox="0 0 100 100" aria-label="Project at risk as to slippage donut chart">
+                        <circle class="project-risk-donut-track" cx="50" cy="50" r="36" pathLength="100"></circle>
+                        @foreach ($projectAtRiskDonutSegments as $segment)
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                             <circle
                                 class="project-risk-donut-segment"
                                 cx="50"
@@ -1039,18 +1336,24 @@
                                 r="36"
                                 pathLength="100"
                                 @style([
+<<<<<<< HEAD
                                     '--segment-length: ' . number_format($segment['length'], 4, '.', ''),
                                     '--segment-delay: ' . number_format($segment['segmentDelayMs'], 2, '.', '') . 'ms',
                                     '--segment-duration: ' . number_format($segment['segmentDurationMs'], 2, '.', '') . 'ms',
                                     '--segment-hover-x: ' . number_format($segmentHoverX, 3, '.', '') . 'px',
                                     '--segment-hover-y: ' . number_format($segmentHoverY, 3, '.', '') . 'px',
                                     'stroke: ' . $segment['color'],
+=======
+                                    'stroke: ' . $segment['color'],
+                                    'stroke-dasharray: ' . number_format($segment['length'], 4, '.', '') . ' 100',
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                                     'stroke-dashoffset: -' . number_format($segment['start'], 4, '.', ''),
                                 ])
                             >
                                 <title>{{ $segment['label'] }}: {{ number_format($segment['percentage'], 2) }}%</title>
                             </circle>
                         @endforeach
+<<<<<<< HEAD
                         @foreach ($projectAtRiskDonutSegments as $segment)
                             @php
                                 $calloutAngle = (($segment['start'] + ($segment['length'] / 2)) * 3.6) - 90;
@@ -1086,6 +1389,8 @@
                                 </text>
                             </g>
                         @endforeach
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                     </svg>
                 </div>
             </div>
@@ -1161,10 +1466,13 @@
                     }
 
                     $projectAtRiskAgingDonutSegments = [];
+<<<<<<< HEAD
                     $projectAtRiskAgingSweepDurationMs = 1400.0;
                     $projectAtRiskAgingMinSegmentDurationMs = 120.0;
                     $projectAtRiskAgingCalloutStepMs = 140.0;
                     $projectAtRiskAgingSweepEndMs = 0.0;
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                     if ($projectAtRiskAgingTotal > 0) {
                         $projectAtRiskAgingBaseSegments = [];
                         foreach ($projectAtRiskAgingChartOrder as $riskLabel) {
@@ -1192,6 +1500,7 @@
                             if ($segmentLength <= 0.01) {
                                 continue;
                             }
+<<<<<<< HEAD
                             $segmentDelayMs = ($projectAtRiskAgingRunningPercent / 100) * $projectAtRiskAgingSweepDurationMs;
                             $segmentDurationMs = max(
                                 $projectAtRiskAgingMinSegmentDurationMs,
@@ -1201,21 +1510,28 @@
                                 $projectAtRiskAgingSweepEndMs,
                                 $segmentDelayMs + $segmentDurationMs
                             );
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
 
                             $projectAtRiskAgingDonutSegments[] = [
                                 'start' => $projectAtRiskAgingRunningPercent,
                                 'length' => $segmentLength,
                                 'color' => $segment['color'],
                                 'label' => $segment['label'],
+<<<<<<< HEAD
                                 'count' => $segment['count'],
                                 'percentage' => $segmentRawPercent,
                                 'segmentDelayMs' => $segmentDelayMs,
                                 'segmentDurationMs' => $segmentDurationMs,
+=======
+                                'percentage' => $segmentRawPercent,
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                             ];
 
                             $projectAtRiskAgingRunningPercent += $segmentLength + $projectAtRiskAgingGapPercent;
                         }
                     }
+<<<<<<< HEAD
                     $projectAtRiskAgingCalloutStartDelayMs = $projectAtRiskAgingSweepEndMs + 120.0;
                 @endphp
                 <div class="project-risk-donut-wrap">
@@ -1237,6 +1553,13 @@
                                 $segmentHoverX = $segmentHoverOffset * cos($segmentMidRadians);
                                 $segmentHoverY = $segmentHoverOffset * sin($segmentMidRadians);
                             @endphp
+=======
+                @endphp
+                <div class="project-risk-donut-wrap">
+                    <svg class="project-risk-donut" viewBox="0 0 100 100" aria-label="Aging of the projects with slippage donut chart">
+                        <circle class="project-risk-donut-track" cx="50" cy="50" r="36" pathLength="100"></circle>
+                        @foreach ($projectAtRiskAgingDonutSegments as $segment)
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                             <circle
                                 class="project-risk-donut-segment"
                                 cx="50"
@@ -1244,18 +1567,24 @@
                                 r="36"
                                 pathLength="100"
                                 @style([
+<<<<<<< HEAD
                                     '--segment-length: ' . number_format($segment['length'], 4, '.', ''),
                                     '--segment-delay: ' . number_format($segment['segmentDelayMs'], 2, '.', '') . 'ms',
                                     '--segment-duration: ' . number_format($segment['segmentDurationMs'], 2, '.', '') . 'ms',
                                     '--segment-hover-x: ' . number_format($segmentHoverX, 3, '.', '') . 'px',
                                     '--segment-hover-y: ' . number_format($segmentHoverY, 3, '.', '') . 'px',
                                     'stroke: ' . $segment['color'],
+=======
+                                    'stroke: ' . $segment['color'],
+                                    'stroke-dasharray: ' . number_format($segment['length'], 4, '.', '') . ' 100',
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                                     'stroke-dashoffset: -' . number_format($segment['start'], 4, '.', ''),
                                 ])
                             >
                                 <title>{{ $segment['label'] }}: {{ number_format($segment['percentage'], 2) }}%</title>
                             </circle>
                         @endforeach
+<<<<<<< HEAD
                         @foreach ($projectAtRiskAgingDonutSegments as $segment)
                             @php
                                 $calloutAngle = (($segment['start'] + ($segment['length'] / 2)) * 3.6) - 90;
@@ -1291,6 +1620,8 @@
                                 </text>
                             </g>
                         @endforeach
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                     </svg>
                 </div>
             </div>
@@ -1327,7 +1658,10 @@
 
         </div>
     </div>
+<<<<<<< HEAD
     </div>
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
 
     @php
         $projectAtRiskAgingProjectsModal = $projectAtRiskAgingProjects ?? [];
@@ -2045,6 +2379,7 @@
             transform: rotate(180deg);
         }
 
+<<<<<<< HEAD
         .dashboard-main-layout {
             display: grid;
             grid-template-columns: minmax(0, 1.8fr) minmax(320px, 1fr);
@@ -2059,6 +2394,10 @@
 
         .dashboard-top-cards {
             grid-template-columns: 1fr;
+=======
+        .dashboard-top-cards {
+            grid-template-columns: minmax(220px, 0.8fr) minmax(460px, 1.2fr);
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
         }
 
         .dashboard-top-cards .total-projects-card {
@@ -2070,6 +2409,7 @@
         }
 
         .dashboard-top-cards .financial-status-card {
+<<<<<<< HEAD
             order: 4;
         }
 
@@ -2085,6 +2425,17 @@
         .status-subaybayan-grid {
             width: 100%;
             min-width: 0;
+=======
+            order: 3;
+        }
+
+        .dashboard-top-cards .status-subaybayan-card {
+            order: 4;
+        }
+
+        .dashboard-status-row {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
         }
 
         .dashboard-status-stack {
@@ -2097,6 +2448,7 @@
             order: 1;
         }
 
+<<<<<<< HEAD
         .dashboard-status-row .project-risk-slippage-card {
             order: 1;
         }
@@ -2109,6 +2461,8 @@
             order: 3;
         }
 
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
         .project-risk-card {
             max-width: none;
             width: 100%;
@@ -2218,7 +2572,11 @@
             display: block;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
+<<<<<<< HEAD
             background-color: #ffffff;
+=======
+            background-color: #f9fafb;
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             padding: 10px;
             margin-bottom: 8px;
         }
@@ -2252,9 +2610,14 @@
 
         .project-update-status-pie-wrap {
             position: relative;
+<<<<<<< HEAD
             width: min(300px, 100%);
             height: auto;
             aspect-ratio: 1 / 1;
+=======
+            width: 300px;
+            height: 300px;
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2264,15 +2627,22 @@
             width: 220px;
             height: 220px;
             display: block;
+<<<<<<< HEAD
             overflow: visible;
+=======
+            transform: rotate(-90deg);
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
         }
 
         .project-update-status-pie-track {
             fill: none;
             stroke: #ffffff;
             stroke-width: 20;
+<<<<<<< HEAD
             transform: rotate(-90deg);
             transform-origin: 50% 50%;
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
         }
 
         .project-update-status-pie-segment {
@@ -2281,6 +2651,7 @@
             stroke-linecap: butt;
             shape-rendering: geometricPrecision;
             cursor: pointer;
+<<<<<<< HEAD
             filter: drop-shadow(0 1.4px 1.5px rgba(15, 23, 42, 0.24)) drop-shadow(0 0 3px rgba(15, 23, 42, 0.16));
             stroke-dasharray: 0 100;
             animation-name: dashboard-donut-sweep;
@@ -2331,6 +2702,8 @@
         .dashboard-donut-callout-value {
             fill: #111827;
             font-weight: 700;
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
         }
 
         .project-update-status-tile {
@@ -2458,15 +2831,24 @@
             align-items: center;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
+<<<<<<< HEAD
             background-color: #ffffff;
+=======
+            background-color: #f9fafb;
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             padding: 10px;
             margin-bottom: 8px;
         }
 
         .project-risk-donut-wrap {
+<<<<<<< HEAD
             width: min(300px, 100%);
             height: auto;
             aspect-ratio: 1 / 1;
+=======
+            width: 300px;
+            height: 300px;
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2476,6 +2858,7 @@
             width: 220px;
             height: 220px;
             display: block;
+<<<<<<< HEAD
             overflow: visible;
         }
 
@@ -2515,14 +2898,20 @@
                 opacity: 1;
                 transform: none;
             }
+=======
+            transform: rotate(-90deg);
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
         }
 
         .project-risk-donut-track {
             fill: none;
             stroke: #ffffff;
             stroke-width: 20;
+<<<<<<< HEAD
             transform: rotate(-90deg);
             transform-origin: 50% 50%;
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
         }
 
         .project-risk-donut-segment {
@@ -2531,6 +2920,7 @@
             stroke-linecap: butt;
             shape-rendering: geometricPrecision;
             cursor: pointer;
+<<<<<<< HEAD
             filter: drop-shadow(0 1.4px 1.5px rgba(15, 23, 42, 0.24)) drop-shadow(0 0 3px rgba(15, 23, 42, 0.16));
             stroke-dasharray: 0 100;
             animation-name: dashboard-donut-sweep;
@@ -2547,6 +2937,8 @@
             --segment-shift-x: var(--segment-hover-x, 0px);
             --segment-shift-y: var(--segment-hover-y, 0px);
             filter: drop-shadow(0 2.2px 2.4px rgba(15, 23, 42, 0.26)) drop-shadow(0 0 4.5px rgba(15, 23, 42, 0.18));
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
         }
 
         .project-risk-chart {
@@ -2796,12 +3188,17 @@
         }
 
         @media (max-width: 1100px) {
+<<<<<<< HEAD
             .dashboard-main-layout {
                 grid-template-columns: 1fr;
             }
 
             .dashboard-top-cards {
                 grid-template-columns: 1fr;
+=======
+            .dashboard-top-cards {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             }
 
             .dashboard-info-tooltip {
@@ -2814,6 +3211,7 @@
                 grid-template-columns: 1fr;
             }
 
+<<<<<<< HEAD
             .fund-source-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             }
@@ -2826,6 +3224,8 @@
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             .project-risk-card {
                 max-width: none;
                 justify-self: stretch;
@@ -2847,7 +3247,15 @@
 
         @media (max-width: 1450px) and (min-width: 1101px) {
             .dashboard-status-row {
+<<<<<<< HEAD
                 grid-template-columns: 1fr;
+=======
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .dashboard-status-row > :first-child {
+                grid-column: 1 / -1;
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             }
         }
 
@@ -2861,7 +3269,12 @@
             }
 
             .project-risk-donut-wrap {
+<<<<<<< HEAD
                 width: min(240px, 100%);
+=======
+                width: 240px;
+                height: 240px;
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             }
 
             .project-risk-donut {
@@ -2890,17 +3303,25 @@
                 grid-template-columns: 1fr;
             }
 
+<<<<<<< HEAD
             .fund-source-grid,
             .status-subaybayan-grid {
                 grid-template-columns: 1fr !important;
             }
 
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             .project-update-status-pie-layout {
                 justify-content: center;
             }
 
             .project-update-status-pie-wrap {
+<<<<<<< HEAD
                 width: min(240px, 100%);
+=======
+                width: 240px;
+                height: 240px;
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             }
 
             .project-update-status-pie {
@@ -2908,10 +3329,13 @@
                 height: 170px;
             }
 
+<<<<<<< HEAD
             .dashboard-donut-callout-text {
                 font-size: 3.5px;
             }
 
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             .financial-amount-value {
                 font-size: clamp(10px, 3.4vw, 13px);
             }
@@ -3332,19 +3756,28 @@
             const slippageCard = document.querySelector('.project-risk-slippage-card');
             const agingCard = document.querySelector('.project-risk-aging-card');
             const shouldSkipSync = window.matchMedia('(max-width: 1100px)').matches;
+<<<<<<< HEAD
             const statusRow = document.querySelector('.dashboard-status-row');
             const cardsToSync = [projectUpdateCard, slippageCard, agingCard].filter(Boolean);
             const minimumCardHeight = 465;
             const hasSingleStatusColumn = statusRow
                 ? window.getComputedStyle(statusRow).gridTemplateColumns.trim().split(/\s+/).length <= 1
                 : true;
+=======
+            const cardsToSync = [projectUpdateCard, slippageCard, agingCard].filter(Boolean);
+            const minimumCardHeight = 465;
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
 
             cardsToSync.forEach((card) => {
                 card.style.height = '';
                 card.style.minHeight = '';
             });
 
+<<<<<<< HEAD
             if (cardsToSync.length < 3 || shouldSkipSync || hasSingleStatusColumn) {
+=======
+            if (cardsToSync.length < 3 || shouldSkipSync) {
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                 return;
             }
 

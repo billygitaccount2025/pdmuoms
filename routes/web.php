@@ -441,6 +441,7 @@ Route::middleware(['auth'])->group(function () {
                 $statusSubaybayanProjectsMap[$statusLabel] = [];
             }
 
+<<<<<<< HEAD
             $carProvinceDisplayOrder = [
                 'Abra',
                 'Apayao',
@@ -481,6 +482,8 @@ Route::middleware(['auth'])->group(function () {
                 return null;
             };
 
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             $normalizeRiskLevel = function ($riskLevel) {
                 $raw = strtoupper(trim((string) $riskLevel));
                 if ($raw === '') {
@@ -925,6 +928,7 @@ Route::middleware(['auth'])->group(function () {
                     ->selectRaw('COUNT(DISTINCT UPPER(TRIM(spp.project_code))) as total_projects')
                     ->value('total_projects') ?? 0);
 
+<<<<<<< HEAD
                 $subayProvinceProjectRows = (clone $subayDashboardQuery)
                     ->selectRaw('TRIM(COALESCE(spp.province, "")) as province')
                     ->selectRaw('COUNT(DISTINCT UPPER(TRIM(spp.project_code))) as total')
@@ -940,6 +944,8 @@ Route::middleware(['auth'])->group(function () {
                     $carProvinceProjectCounts[$normalizedProvince] += (int) ($row->total ?? 0);
                 }
 
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                 $balanceByProjectQuery = (clone $subayDashboardQuery)
                     ->selectRaw('UPPER(TRIM(spp.project_code)) as project_code')
                     ->selectRaw('MAX(TRIM(COALESCE(spp.project_title, ""))) as project_title')
@@ -1281,6 +1287,7 @@ Route::middleware(['auth'])->group(function () {
                 }
 
                 $totalProjects = (int) (clone $fallbackQuery)->count();
+<<<<<<< HEAD
 
                 $fallbackProvinceProjectRows = (clone $fallbackQuery)
                     ->selectRaw('TRIM(COALESCE(province, "")) as province')
@@ -1303,6 +1310,8 @@ Route::middleware(['auth'])->group(function () {
                     $carProvinceProjectCounts[$normalizedProvince] += $countValue;
                 }
 
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                 $financialTotals = (clone $fallbackQuery)
                     ->selectRaw('COALESCE(SUM(COALESCE(obligation, 0)), 0) as total_obligation')
                     ->selectRaw('COALESCE(SUM(COALESCE(disbursed_amount, 0)), 0) as total_disbursement')
@@ -1436,10 +1445,13 @@ Route::middleware(['auth'])->group(function () {
                     ->values();
             }
 
+<<<<<<< HEAD
             $carProvinceProjectMaxCount = !empty($carProvinceProjectCounts)
                 ? (int) max($carProvinceProjectCounts)
                 : 0;
 
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             return view('dashboard.index', compact(
                 'totalProjects',
                 'statusActualCounts',
@@ -1463,9 +1475,13 @@ Route::middleware(['auth'])->group(function () {
                 'projectUpdateRiskProjects',
                 'projectsWithBalance',
                 'financialStatusProjects',
+<<<<<<< HEAD
                 'fundSourceProjectsMap',
                 'carProvinceProjectCounts',
                 'carProvinceProjectMaxCount'
+=======
+                'fundSourceProjectsMap'
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             ));
         } catch (\Exception $e) {
             return response()->json([

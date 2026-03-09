@@ -40,7 +40,11 @@
             background: linear-gradient(135deg, #002C76 0%, #003d99 100%);
             padding: 20px;
             overflow-y: auto;
+<<<<<<< HEAD
             transition: transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1), width 280ms cubic-bezier(0.2, 0.8, 0.2, 1), padding 280ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+=======
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             will-change: transform;
             z-index: 1000;
             box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
@@ -51,6 +55,7 @@
             transform: translateX(-100%);
             box-shadow: none;
             pointer-events: none;
+<<<<<<< HEAD
         }
 
         .sidebar.icon-collapsed {
@@ -59,6 +64,8 @@
             transform: translateX(0);
             box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
             pointer-events: auto;
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
         }
         
         .sidebar-header {
@@ -241,7 +248,11 @@
             padding: 0 30px;
             z-index: 999;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+<<<<<<< HEAD
             transition: padding-left 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+=======
+            transition: none;
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
         }
         
         .topbar.with-sidebar {
@@ -577,7 +588,11 @@
             margin-left: 250px;
             padding: 30px;
             min-height: calc(100vh - 70px);
+<<<<<<< HEAD
             transition: margin-left 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+=======
+            transition: none;
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
         }
         
         .main-content.with-sidebar {
@@ -669,12 +684,15 @@
             
             .sidebar.collapsed {
                 transform: translateX(-100%);
+<<<<<<< HEAD
                 opacity: 0;
             }
 
             .sidebar.icon-collapsed {
                 width: 220px;
                 padding: 20px;
+=======
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             }
             
             .topbar {
@@ -895,9 +913,21 @@
     <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
+<<<<<<< HEAD
             <a href="{{ route('dashboard') }}" class="sidebar-brand-link" aria-label="Go to dashboard">
                 <img src="{{ asset('PDMUOMS.png') }}" alt="PDMUOMS" class="sidebar-logo">
             </a>
+=======
+            <img src="{{ asset('DILG-Logo.png') }}" alt="DILG Logo" class="sidebar-logo">
+            <div class="sidebar-title">
+                DILG-CAR
+                <small>PDMU OPERATIONS MANAGEMENT SYSTEM (PDMUOMS)</small>
+            </div>
+            <!-- Close Button for Mobile -->
+            <button id="closeSidebarBtn" style="display: none; position: absolute; right: 15px; top: 20px; background: none; border: none; color: white; font-size: 24px; cursor: pointer; width: 40px; height: 40px; padding: 0; border-radius: 6px; transition: all 0.3s ease;" title="Close Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
         </div>
         
         <ul class="sidebar-menu">
@@ -951,8 +981,13 @@
                 @endphp
                 <a href="#" class="@if($reportsMenuActive) active @endif submenu-toggle" onclick="toggleSubmenu(event, 'reportsMenu')">
                     <i class="fas fa-file-alt"></i>
+<<<<<<< HEAD
                     <span>LGU Reportorial Requirements</span>
                     <i class="fas fa-chevron-down submenu-chevron" style="margin-left: auto; font-size: 12px;"></i>
+=======
+                    <span>Reportorial Requirements</span>
+                    <i class="fas fa-chevron-down" style="margin-left: auto; font-size: 12px;"></i>
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                 </a>
                 <ul id="reportsMenu" class="submenu" style="display: {{ $reportsMenuActive ? 'block' : 'none' }};">
                     <li>
@@ -1015,6 +1050,18 @@
                             </li>
                         </ul>
                     </li>
+                    <li>
+                        <a href="{{ route('road-maintenance-status.index') }}" class="@if(request()->routeIs('road-maintenance-status.*')) active @endif">
+                            <i class="fas fa-road"></i>
+                            <span>Road Maintenance Status Report</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('rbis-annual-certification.index') }}" class="@if(request()->routeIs('rbis-annual-certification.*')) active @endif">
+                            <i class="fas fa-bridge"></i>
+                            <span>RBIS Annual Certification</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li>
@@ -1029,6 +1076,7 @@
             @endphp
             @if($isRegionalDilg)
                 <li>
+<<<<<<< HEAD
                     @php
                         $systemManagementActive = request()->routeIs('system-management.*');
                     @endphp
@@ -1038,6 +1086,14 @@
                         <i class="fas fa-chevron-down submenu-chevron" style="margin-left: auto; font-size: 12px;"></i>
                     </a>
                     <ul id="systemManagementMenu" class="submenu" style="display: {{ $systemManagementActive ? 'block' : 'none' }};">
+=======
+                    <a href="#" class="@if(Route::currentRouteName() == 'system-management.index' || Route::currentRouteName() == 'system-management.upload-subaybayan') active @endif" onclick="toggleSubmenu(event, 'systemManagementMenu')">
+                        <i class="fas fa-cogs"></i>
+                        <span>System Management</span>
+                        <i class="fas fa-chevron-down" style="margin-left: auto; font-size: 12px;"></i>
+                    </a>
+                    <ul id="systemManagementMenu" class="submenu" style="display: none;">
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                         <li>
                             <a href="{{ route('system-management.upload-subaybayan') }}" class="@if(Route::currentRouteName() == 'system-management.upload-subaybayan') active @endif">
                                 <i class="fas fa-upload"></i>

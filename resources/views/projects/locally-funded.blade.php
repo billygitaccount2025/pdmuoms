@@ -154,7 +154,11 @@
                     return route('projects.locally-funded', $query);
                 };
             @endphp
+<<<<<<< HEAD
             <div class="lfp-table-wrap" role="region" aria-label="Locally Funded Projects table" tabindex="0">
+=======
+            <div style="overflow-x: hidden; overflow-y: hidden;">
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
                 <table id="lfp-table" style="width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed;">
                     <thead>
                         <tr style="background-color: #f3f4f6; border-bottom: 2px solid #d1d5db;">
@@ -402,10 +406,20 @@
         @endif
     </div>
     <style>
-        table td {
-            vertical-align: top;
+                        table td {
+                            vertical-align: top;
+                        }
+
+        #lfp-table th,
+        #lfp-table td {
+            white-space: normal !important;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            min-width: 0 !important;
+            padding: 8px !important;
         }
 
+<<<<<<< HEAD
         .lfp-table-wrap {
             width: 100%;
             overflow-x: auto;
@@ -444,6 +458,12 @@
             white-space: normal;
         }
 
+=======
+        #lfp-table .wrap-text {
+            white-space: normal;
+        }
+
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
         .lfp-sort-link {
             border: none;
             padding: 0;
@@ -479,6 +499,7 @@
         }
 
         @media (max-width: 768px) {
+<<<<<<< HEAD
             #lfp-filters-form > div {
                 width: 100%;
                 min-width: 0 !important;
@@ -512,6 +533,11 @@
 
             #lfp-table td .wrap-text {
                 min-width: 260px;
+=======
+            th, td {
+                padding: 6px !important;
+                font-size: 11px;
+>>>>>>> df4327217342f0271027b09416f0dfdaba8d6bda
             }
         }
 
